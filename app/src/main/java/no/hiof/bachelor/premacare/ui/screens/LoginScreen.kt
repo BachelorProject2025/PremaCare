@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -89,8 +90,15 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
                     .fillMaxWidth()
             )
 
+            SpaceEm(10.dp)
+            // Not sure about this one ....
+            Text( text = "LOGIN",
+                color = Color(0xFF333333),
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            SpaceEm(10.dp)
 
             // ----------Login------------------------
             OutlinedTextField(
@@ -128,7 +136,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
                 }
             )
 
-            SpaceEm(19.dp)
+            SpaceEm(10.dp)
 
             ButtonWithToast(
                 firebaseViewModel,
@@ -138,13 +146,11 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
                 "Incorrect email or password. Please try again."
             )
 
-            SpaceEm(10.dp)
+            SpaceEm(5.dp)
 
             newUserText(newUser, "Not yet a User?")
 
-            SpaceEm(13.dp)
-
-            aboutUsText(aboutUs," ©Designed & Develop By  Chanipoa Dencharoen," +
+            aboutUsText(aboutUs," ©Designed & Develop By Chanipa Dencharoen," +
                     "" +
                     " Heljar Andreas Nilsen Korbi and Daniel John Russell" )
 
@@ -158,7 +164,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
 fun newUserText(newUser: () -> Unit, text: String) {
     Text(
         text = text,
-        color = Color.Black,
+        color = Color(0xFF1A237E),
         fontSize = 20.sp,
         textDecoration = TextDecoration.Underline,
         modifier = Modifier.clickable { newUser() }

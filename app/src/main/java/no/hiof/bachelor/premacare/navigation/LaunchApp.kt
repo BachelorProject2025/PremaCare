@@ -50,6 +50,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.ui.screens.AboutUs
+import no.hiof.bachelor.premacare.ui.screens.DashBoardScreen
 import no.hiof.bachelor.premacare.ui.screens.LogScreen
 import no.hiof.bachelor.premacare.ui.screens.LoginScreen
 import no.hiof.bachelor.premacare.ui.screens.RegisterScreen
@@ -75,7 +76,7 @@ fun LaunchApp(auth: FirebaseAuth) {
             // Define the gradient
             val gradient = Brush.linearGradient(
                 colors = listOf(
-                    Color(0xFF79ECE0),  // cyan
+                    Color(0xFF79ECE0),// cyan
                     Color.White
                 )
             )
@@ -86,6 +87,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 AppScreens.Login.name -> "Login"
                 AppScreens.Register.name -> "Register"
                 AppScreens.Log.name -> "Log"
+                AppScreens.DashBoard.name -> "Dashboard"
 
                 // TODO:
                 //  add the search title or a searchbar
@@ -106,7 +108,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = Color.Transparent, // Make the AppBar container transparent
-                        titleContentColor = colorResource(id = R.color.white)
+                        titleContentColor = Color.Black
                     ),
                     title = {
                         Text(
@@ -123,7 +125,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                             Icon(
                                 imageVector = Icons.Outlined.ArrowBack,
                                 contentDescription = "Back",
-                                tint =  Color.White
+                                tint =  Color.Black
                             )
                         }
                     },
@@ -136,7 +138,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                                 Icon(
                                     imageVector = Icons.Outlined.Settings,
                                     contentDescription = "User Settings",
-                                    tint =  Color.White
+                                    tint =  Color.Black
                                 )
 
 
@@ -148,7 +150,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                             }) {
                                 Icon(imageVector = Icons.Outlined.AccountCircle,
                                     contentDescription = "Login",
-                                    tint =  Color.White)
+                                    tint =  Color.Black)
                             }
                         }
 
@@ -160,7 +162,7 @@ fun LaunchApp(auth: FirebaseAuth) {
     }, bottomBar = {
         if (isBottomBarVisible.value) {
 
-            BottomAppBar(containerColor = Color.Cyan) {
+            BottomAppBar(containerColor = Color(0xFF79ECE0)) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
@@ -181,12 +183,12 @@ fun LaunchApp(auth: FirebaseAuth) {
                                 imageVector = item.icon,
                                 contentDescription = item.label,
                                 modifier = Modifier.size(30.dp),
-                                tint = if (isSelected) Color.White else Color.LightGray
+                                tint = if (isSelected) Color.Black else Color.LightGray
 
                             )
                             Text(
                                 text = item.label,
-                                color = if (isSelected) Color.White else Color.LightGray
+                                color = if (isSelected) Color.Black else Color.LightGray
                                 )
 
                         }
@@ -238,7 +240,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isBottomBarVisible.value = false
                 isTopAppVisible.value = false
                 isFloatingActionButtonVisible.value = false
-                RegisterScreen()
+                RegisterScreen(toLogin = {navController.navigate(AppScreens.Login.name)})
             }
 
             composable(AppScreens.About.name) {
@@ -246,6 +248,13 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isTopAppVisible.value = false
                 isFloatingActionButtonVisible.value = false
                 AboutUs()
+            }
+
+            composable(AppScreens.DashBoard.name) {
+                isBottomBarVisible.value = true
+                isTopAppVisible.value = true
+                isFloatingActionButtonVisible.value = true
+                DashBoardScreen(home = {navController.navigate(AppScreens.Login.name)})
             }
 
         }
@@ -256,8 +265,8 @@ fun LaunchApp(auth: FirebaseAuth) {
 //List of Icons and text for navbar(bottom bar)
 val items = listOf(
 
-    BottomNavItems(AppScreens.DashBoard, Icons.Outlined.Dashboard, "Activity"),
-    BottomNavItems(AppScreens.Log, Icons.Outlined.List, "Profile"),
+    BottomNavItems(AppScreens.DashBoard, Icons.Outlined.Dashboard, "Dashboard"),
+    BottomNavItems(AppScreens.Log, Icons.Outlined.List, "Log"),
 
 )
 
