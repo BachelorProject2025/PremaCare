@@ -29,8 +29,8 @@ class FirebaseViewModel : ViewModel() {
     private var _username = mutableStateOf("")
     val username = _username
 
-    private var _userProfileName = mutableStateOf("")
-    val userProfileName = _userProfileName // Used to display the username in the profile
+    private var _childsName = mutableStateOf("")
+    val childsName = _childsName // Used to display the username in the profile
 
     private var _memberSince = mutableStateOf("")
     val memberSince = _memberSince
@@ -40,8 +40,8 @@ class FirebaseViewModel : ViewModel() {
     fun registerUser() {
         val emailValue = email.value
         val passwordValue = password.value
-        val usernameValue = username.value
-        if (emailValue.isNotBlank() && passwordValue.isNotBlank() && usernameValue.isNotBlank()) {
+        val childsNameValue = childsName.value
+        if (emailValue.isNotBlank() && passwordValue.isNotBlank() && childsNameValue.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     // Create the user in Firebase Authentication
@@ -52,12 +52,12 @@ class FirebaseViewModel : ViewModel() {
                     currentUser?.let { user ->
                         val userId = user.uid
                         val userMap = hashMapOf(
-                            "username" to usernameValue,
+                            "childsName" to childsName.value,
                             "email" to emailValue
                         )
                         firestore.collection("users").document(userId).set(userMap).await()
                     }
-                    fetchUserProfileName()
+                    fetchChildsName()
                 } catch (e: Exception) {
                     // Handle registration failure
                     println(e.message)
@@ -67,14 +67,14 @@ class FirebaseViewModel : ViewModel() {
     }
 
     // Fetch the username from Firestore
-    fun fetchUserProfileName() {
+    fun fetchChildsName() {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
             val userId = user.uid
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val userSnapshot = firestore.collection("users").document(userId).get().await()
-                    _userProfileName.value = userSnapshot.getString("username") ?: ""
+                    _childsName.value = userSnapshot.getString("childsName") ?: ""
                 } catch (e: Exception) {
                     println(e.message)
                 }
@@ -102,7 +102,7 @@ class FirebaseViewModel : ViewModel() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     auth.signInWithEmailAndPassword(emailValue, passwordValue).await()
-                    fetchUserProfileName()
+                    fetchChildsName()
 
                 } catch (e: Exception) {
                     // Handle login failure
