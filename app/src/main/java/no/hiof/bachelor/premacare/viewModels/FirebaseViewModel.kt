@@ -32,6 +32,15 @@ class FirebaseViewModel : ViewModel() {
     private var _childsName = mutableStateOf("")
     val childsName = _childsName // Used to display the username in the profile
 
+    private var _chilDateOfBirth = mutableStateOf("")
+    val chilDateOfBirth = _chilDateOfBirth
+
+    private var _parentName = mutableStateOf("")
+    val parentName = _parentName
+
+    private var _phoneNumber = mutableStateOf("")
+    val phoneNumer = _phoneNumber
+
     private var _memberSince = mutableStateOf("")
     val memberSince = _memberSince
 
@@ -40,7 +49,10 @@ class FirebaseViewModel : ViewModel() {
     fun registerUser() {
         val emailValue = email.value
         val passwordValue = password.value
+        val parentNameValue = parentName.value
+        val phoneNumerValue = phoneNumer.value
         val childsNameValue = childsName.value
+        val chilDateOfBirthValue = chilDateOfBirth.value
         if (emailValue.isNotBlank() && passwordValue.isNotBlank() && childsNameValue.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -52,7 +64,10 @@ class FirebaseViewModel : ViewModel() {
                     currentUser?.let { user ->
                         val userId = user.uid
                         val userMap = hashMapOf(
+                            "chilDateOfBirth" to chilDateOfBirth.value,
                             "childsName" to childsName.value,
+                            "parentName" to parentNameValue,
+                            "phoneNumer" to phoneNumerValue,
                             "email" to emailValue
                         )
                         firestore.collection("users").document(userId).set(userMap).await()

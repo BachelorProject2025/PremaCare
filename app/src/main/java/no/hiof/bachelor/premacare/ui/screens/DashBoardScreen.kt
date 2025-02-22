@@ -24,7 +24,7 @@ fun DashBoardScreen(home: ()-> Unit) {
             firebaseViewModel.logOut()
             home()
         })
-//bare for å teste å hente ut barns navn 
+//bare for å teste å hente ut barns navn
     Text(firebaseViewModel.childsName.value)
 
 

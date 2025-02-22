@@ -53,6 +53,7 @@ import no.hiof.bachelor.premacare.ui.screens.AboutUs
 import no.hiof.bachelor.premacare.ui.screens.DashBoardScreen
 import no.hiof.bachelor.premacare.ui.screens.LogScreen
 import no.hiof.bachelor.premacare.ui.screens.LoginScreen
+import no.hiof.bachelor.premacare.ui.screens.NewEntry
 import no.hiof.bachelor.premacare.ui.screens.RegisterScreen
 
 
@@ -88,6 +89,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 AppScreens.Register.name -> "Register"
                 AppScreens.Log.name -> "Log"
                 AppScreens.DashBoard.name -> "Dashboard"
+                AppScreens.NewEntry.name -> "New Entry"
 
                 // TODO:
                 //  add the search title or a searchbar
@@ -198,7 +200,9 @@ fun LaunchApp(auth: FirebaseAuth) {
         }
     }, floatingActionButton = {
         if (isFloatingActionButtonVisible.value){
-            SearchFloatingAction(toSearch = {})
+            SearchFloatingAction(toEntry = {
+                navController.navigate(AppScreens.NewEntry.name)
+            })
         }
     }
 
@@ -257,6 +261,13 @@ fun LaunchApp(auth: FirebaseAuth) {
                 DashBoardScreen(home = {navController.navigate(AppScreens.Login.name)})
             }
 
+            composable(AppScreens.NewEntry.name) {
+                isBottomBarVisible.value = true
+                isTopAppVisible.value = true
+                isFloatingActionButtonVisible.value = true
+                NewEntry()
+            }
+
         }
 
     }
@@ -284,8 +295,8 @@ private fun determineStartDestination(currentUser: FirebaseUser?): String {
 
 
 @Composable
-fun SearchFloatingAction( toSearch: ()-> Unit) {
-    FloatingActionButton(onClick = { toSearch()},
+fun SearchFloatingAction( toEntry: ()-> Unit) {
+    FloatingActionButton(onClick = { toEntry()},
         containerColor = Color.LightGray,
         contentColor = Color.White
 

@@ -6,4 +6,5 @@ enum class AppScreens {
     Log,
     DashBoard,
     About,
+    NewEntry
 }
