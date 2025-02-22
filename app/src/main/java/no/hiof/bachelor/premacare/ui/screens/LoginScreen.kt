@@ -150,7 +150,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
 
             newUserText(newUser, "Not yet a User?")
 
-            aboutUsText(aboutUs," ©Designed & Develop By Chanipa Dencharoen," +
+            aboutUsText(aboutUs,"  V1 ©Designed & Develop By Chanipa Dencharoen," +
                     "" +
                     " Heljar Andreas Nilsen Korbi and Daniel John Russell" )
 
