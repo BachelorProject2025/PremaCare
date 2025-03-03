@@ -69,7 +69,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 .padding(7.dp)
                 .shadow(8.dp, shape = RoundedCornerShape(5.dp)), // Slightly rounded shadow
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFF5F5F5) // Light background
+                containerColor = Color(0xFFE3F2FD) // Light blue
             ),
             shape = RoundedCornerShape(5.dp), // Rounded corners
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -116,7 +116,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 .padding(7.dp)
                 .shadow(8.dp, shape = RoundedCornerShape(5.dp)), // Slightly rounded shadow
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFF5F5F5) // Light background
+                containerColor = Color(0xFFFCE4EC) // Light pink
             ),
             shape = RoundedCornerShape(5.dp), // Rounded corners
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -164,7 +164,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 .padding(7.dp)
                 .shadow(8.dp, shape = RoundedCornerShape(5.dp)), // Slightly rounded shadow
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFF5F5F5) // Light background
+                containerColor = Color(0xFFE8F5E9) // Light green
             ),
             shape = RoundedCornerShape(5.dp), // Rounded corners
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
@@ -224,14 +224,19 @@ fun RegisterScreen(toLogin: ()-> Unit) {
         Button(onClick = { toLogin();
             firebaseViewModel.registerUser()},
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF4ABAB3),
+                //0xFF4ABAB3 <-- denne vi har brukt men kke bra nokk for fargebilde
+                containerColor = Color(0xFF1565C0), //<-- Royal Blue vi tester ut denne!
                 contentColor = Color.White
             ),
             shape = RoundedCornerShape(size = 12.dp),
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 6.dp,
                 pressedElevation = 2.dp
-            )
+            ),
+            modifier = Modifier
+                .padding(15.dp)
+                .fillMaxWidth()
+                .height(50.dp)
         ) {
             Text(
 
