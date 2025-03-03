@@ -213,7 +213,7 @@ fun ButtonWithToast(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF4ABAB3),
+            containerColor = Color(0xFF1565C0),//<- Royal Blue
             contentColor = Color.White
         ),
         shape = RoundedCornerShape(size = 12.dp),
