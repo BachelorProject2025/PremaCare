@@ -55,7 +55,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
         modifier = Modifier.fillMaxSize()
     ) {
 
-        Text( text = "REGISTER",
+        Text( text = "REGISTERE",
             color = Color(0xFF333333),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
@@ -67,18 +67,20 @@ fun RegisterScreen(toLogin: ()-> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(7.dp)
-                .shadow(8.dp, shape = RoundedCornerShape(5.dp)), // Slightly rounded shadow
+                .shadow(8.dp, shape = RoundedCornerShape(5.dp)),
             colors = CardDefaults.cardColors(
+                //0xFFFFF3E0 Light orange
+                //0xFFE3F2FD Light blue
                 containerColor = Color(0xFFE3F2FD) // Light blue
             ),
-            shape = RoundedCornerShape(5.dp), // Rounded corners
+            shape = RoundedCornerShape(5.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp) // Add padding inside the Card
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Information About Parent/Legal Representative",
+                    text = "Informasjon Om Foreldre/Foresatte",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -87,7 +89,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 OutlinedTextField(
                     value = firebaseViewModel.parentName.value,
                     onValueChange = { newValue -> firebaseViewModel.parentName.value = newValue },
-                    label = { Text("Name of Parent") },
+                    label = { Text("Forelders Navn") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -98,7 +100,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 OutlinedTextField(
                     value = firebaseViewModel.phoneNumer.value,
                     onValueChange = { newValue -> firebaseViewModel.phoneNumer.value = newValue },
-                    label = { Text("Phone Number") },
+                    label = { Text("Telefon Nummer") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -114,18 +116,20 @@ fun RegisterScreen(toLogin: ()-> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(7.dp)
-                .shadow(8.dp, shape = RoundedCornerShape(5.dp)), // Slightly rounded shadow
+                .shadow(8.dp, shape = RoundedCornerShape(5.dp)),
             colors = CardDefaults.cardColors(
+                //0xFFEDE7F6 Light purple
+                //0xFFFCE4EC Light pink
                 containerColor = Color(0xFFFCE4EC) // Light pink
             ),
-            shape = RoundedCornerShape(5.dp), // Rounded corners
+            shape = RoundedCornerShape(5.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp) // Add padding inside the Card
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Information About Child",
+                    text = "Informasjon Om Barnet",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -134,7 +138,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 OutlinedTextField(
                     value = firebaseViewModel.childsName.value,
                     onValueChange = { newValue -> firebaseViewModel.childsName.value = newValue },
-                    label = { Text("Name of Child") },
+                    label = { Text("Barnets Navn") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -145,7 +149,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 OutlinedTextField(
                     value = firebaseViewModel.chilDateOfBirth.value,
                     onValueChange = { newValue -> firebaseViewModel.chilDateOfBirth.value = newValue },
-                    label = { Text("Child`s Date Of Birth") },
+                    label = { Text("Barnet Er Født") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -162,18 +166,20 @@ fun RegisterScreen(toLogin: ()-> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(7.dp)
-                .shadow(8.dp, shape = RoundedCornerShape(5.dp)), // Slightly rounded shadow
+                .shadow(8.dp, shape = RoundedCornerShape(5.dp)),
             colors = CardDefaults.cardColors(
+                //0xFFFFF9C4 Light yellow
+                //0xFFE8F5E9 Light green
                 containerColor = Color(0xFFE8F5E9) // Light green
             ),
-            shape = RoundedCornerShape(5.dp), // Rounded corners
+            shape = RoundedCornerShape(5.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp) // Add padding inside the Card
+                modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Credentials",
+                    text = "Påloggingsinformasjon",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -182,7 +188,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 OutlinedTextField(
                     value = firebaseViewModel.email.value,
                     onValueChange = { newValue -> firebaseViewModel.email.value = newValue },
-                    label = { Text("Email") },
+                    label = { Text("E-post") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -195,7 +201,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 OutlinedTextField(
                     value = firebaseViewModel.password.value,
                     onValueChange = { newValue -> firebaseViewModel.password.value = newValue },
-                    label = { Text("Password") },
+                    label = { Text("Passord") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -243,7 +249,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp,
-                text = "Sign up")
+                text = "SIGN UP")
         }
     }
 }
