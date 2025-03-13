@@ -30,7 +30,7 @@ class FirebaseViewModel : ViewModel() {
     val username = _username
 
     private var _childsName = mutableStateOf("")
-    val childsName = _childsName // Used to display the username in the profile
+    val childsName = _childsName
 
     private var _chilDateOfBirth = mutableStateOf("")
     val chilDateOfBirth = _chilDateOfBirth

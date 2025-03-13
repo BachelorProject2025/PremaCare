@@ -64,7 +64,12 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
 
     val gradient = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF79ECE0),  // cyan
+            //0xFFA040C0  livlig lilla
+            //0xFF50D4F2  cyan/blå
+            // 0xFFE8F5E9 lys grønnaktig farge
+
+
+            Color( 0xFF50D4F2),  // cyan
             Color.White
         )
     )
@@ -92,7 +97,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
 
             SpaceEm(10.dp)
             // Not sure about this one ....
-            Text( text = "LOGIN",
+            Text( text = "LOGG IN",
                 color = Color(0xFF333333),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
@@ -104,7 +109,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
             OutlinedTextField(
                 value = firebaseViewModel.email.value,
                 onValueChange = { newValue -> firebaseViewModel.email.value = newValue },
-                label = { Text("Email") },
+                label = { Text("E-Post") },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color(0x80FFFFFF),
                     unfocusedContainerColor = Color.White
@@ -116,7 +121,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
             OutlinedTextField(
                 value = firebaseViewModel.password.value,
                 onValueChange = { newValue -> firebaseViewModel.password.value = newValue },
-                label = { Text("Password") },
+                label = { Text("Passord") },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color(0x80FFFFFF),
                     unfocusedContainerColor = Color.White
@@ -141,14 +146,14 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
             ButtonWithToast(
                 firebaseViewModel,
                 { takeMeDash() },
-                "Login",
+                "Logg inn",
                 auth = auth,
                 "Incorrect email or password. Please try again."
             )
 
             SpaceEm(5.dp)
 
-            newUserText(newUser, "Not yet a User?")
+            newUserText(newUser, "Ny bruker?")
 
             aboutUsText(aboutUs,"  V1 ©Designed & Develop By Chanipa Dencharoen," +
                     "" +

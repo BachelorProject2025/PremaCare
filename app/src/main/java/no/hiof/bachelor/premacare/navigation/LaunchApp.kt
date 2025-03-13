@@ -77,8 +77,15 @@ fun LaunchApp(auth: FirebaseAuth) {
             // Define the gradient
             val gradient = Brush.linearGradient(
                 colors = listOf(
-                    Color(0xFF79ECE0),// cyan
-                    Color.White
+                    //0xFFA040C0  livlig lilla
+                    //0xFF602070 En dyp mørk lilla
+                    //0xFF50D4F2 cyan/blue
+                    //0xFF3BA3C0 mørkere cyan/blue
+                    // 0xFFE8F5E9 lys grønnaktig farge
+                    // 0xFFC8E6C9 litt mørkere grønn
+
+                    Color(0xFF50D4F2), //cyan/blue
+                    Color(0xFF3BA3C0) // mørkere cyan/blue
                 )
             )
 
@@ -163,8 +170,11 @@ fun LaunchApp(auth: FirebaseAuth) {
         }
     }, bottomBar = {
         if (isBottomBarVisible.value) {
-
-            BottomAppBar(containerColor = Color(0xFF79ECE0)) {
+            //0xFFA040C0  livlig lilla
+            //0xFF50D4F2 cyan/blue
+            //0xFFA040C0 livlig lilla
+            // 0xFFE8F5E9 lys grønnaktig farge
+            BottomAppBar(containerColor = Color(0xFF50D4F2)) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
@@ -185,12 +195,12 @@ fun LaunchApp(auth: FirebaseAuth) {
                                 imageVector = item.icon,
                                 contentDescription = item.label,
                                 modifier = Modifier.size(30.dp),
-                                tint = if (isSelected) Color.Black else Color.LightGray
+                                tint = if (isSelected) Color.Black else Color.White
 
                             )
                             Text(
                                 text = item.label,
-                                color = if (isSelected) Color.Black else Color.LightGray
+                                color = if (isSelected) Color.Black else Color.White
                                 )
 
                         }
@@ -297,7 +307,7 @@ private fun determineStartDestination(currentUser: FirebaseUser?): String {
 @Composable
 fun SearchFloatingAction( toEntry: ()-> Unit) {
     FloatingActionButton(onClick = { toEntry()},
-        containerColor = Color.LightGray,
+        containerColor = Color.DarkGray,
         contentColor = Color.White
 
     ) {
