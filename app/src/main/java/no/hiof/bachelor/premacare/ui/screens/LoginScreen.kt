@@ -10,11 +10,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
@@ -22,7 +24,10 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -46,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -57,7 +63,7 @@ import no.hiof.bachelor.premacare.R
 
 
 @Composable
-fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth, newUser: () -> Unit) {
+fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth, newUser: () -> Unit, reset: () -> Unit) {
     val firebaseViewModel: FirebaseViewModel = viewModel()
     var showPassword by remember { mutableStateOf(false) }
     val passwordVisualTransformation = remember { PasswordVisualTransformation() }
@@ -84,6 +90,7 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
             verticalArrangement = Arrangement.Top,
             modifier = Modifier
                 .fillMaxSize()
+                .padding(16.dp)
 
         ) {
 
@@ -97,11 +104,12 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
 
             SpaceEm(10.dp)
             // Not sure about this one ....
-            Text( text = "LOGG IN",
-                color = Color(0xFF333333),
-                fontSize = 22.sp,
+            Text(
+                text = "Logg inn",
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                )
+                textAlign = TextAlign.Center
+            )
 
             SpaceEm(10.dp)
 
@@ -112,11 +120,16 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
                 label = { Text("E-Post") },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Color(0x80FFFFFF),
-                    unfocusedContainerColor = Color.White
-                )
+                    unfocusedContainerColor = Color.White,
+
+                ),
+                modifier = Modifier.fillMaxWidth()
+
             )
 
             SpaceEm(10.dp)
+
+            var showPassword by remember { mutableStateOf(false) }
 
             OutlinedTextField(
                 value = firebaseViewModel.password.value,
@@ -129,40 +142,58 @@ fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth,
                 visualTransformation = if (showPassword) {
                     VisualTransformation.None
                 } else {
-                    passwordVisualTransformation
+                    PasswordVisualTransformation()
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth(),  // This is fine now
                 trailingIcon = {
-                    Icon(
-                        if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                        contentDescription = "Toggle password visibility",
-                        modifier = Modifier.clickable { showPassword = !showPassword }
-                    )
+                    IconButton(onClick = { showPassword = !showPassword }) {
+                        Icon(
+                            imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                            contentDescription = "Toggle password visibility"
+                        )
+                    }
                 }
             )
 
-            SpaceEm(10.dp)
+
+            SpaceEm(15.dp)
 
             ButtonWithToast(
                 firebaseViewModel,
                 { takeMeDash() },
                 "Logg inn",
                 auth = auth,
-                "Incorrect email or password. Please try again."
+                "Obs, Noe gikk galt. Vennligst prøv igjen."
             )
 
-            SpaceEm(5.dp)
+            SpaceEm(10.dp)
 
-            newUserText(newUser, "Ny bruker?")
 
-            aboutUsText(aboutUs,"  V1 ©Designed & Develop By Chanipa Dencharoen," +
-                    "" +
-                    " Heljar Andreas Nilsen Korbi and Daniel John Russell" )
+            AuthFooter(
+               newUser, reset
+            )
+
+            AboutUsText(aboutUs,"  V1 Om Oss" )
 
 
         }
     }
 }
+
+@Composable
+fun AuthFooter(newUser: () -> Unit, reset: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        newUserText(newUser, "Ny bruker?")
+        forgetPasswordText(reset, "Glemt Passord?")
+    }
+}
+
 
 
 @Composable
@@ -170,14 +201,25 @@ fun newUserText(newUser: () -> Unit, text: String) {
     Text(
         text = text,
         color = Color(0xFF1A237E),
-        fontSize = 20.sp,
+        fontSize = 17.sp,
         textDecoration = TextDecoration.Underline,
         modifier = Modifier.clickable { newUser() }
     )
 }
 
 @Composable
-fun aboutUsText(aboutUs: () -> Unit, text: String) {
+fun forgetPasswordText(reset: () -> Unit, text: String) {
+    Text(
+        text = text,
+        color = Color(0xFF1A237E),
+        fontSize = 17.sp,
+        textDecoration = TextDecoration.Underline,
+        modifier = Modifier.clickable { reset() }
+    )
+}
+
+@Composable
+fun AboutUsText(aboutUs: () -> Unit, text: String) {
     Text(
         text = text,
         color = Color.Gray,
@@ -207,38 +249,55 @@ fun ButtonWithToast(
 ) {
     val currentUser = auth.currentUser
     val context = LocalContext.current
+    var loading by remember { mutableStateOf(false) } // State for loading
 
     Button(
         onClick = {
-            firebaseViewModel.loginUser()
-            takeMeDash()
+            // Set loading to true when login is initiated
+            loading = true
 
-            if (currentUser == null) {
-                Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+            // Call the login function
+            firebaseViewModel.loginUser { success ->
+                loading = false  // Stop loading once login is finished
+
+                if (success) {
+                    // If login is successful, navigate to the dashboard
+                    takeMeDash()
+                } else {
+                    // If login failed, show the error message
+                    Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+                }
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF1565C0),//<- Royal Blue
+            containerColor = Color(0xFF1565C0),
             contentColor = Color.White
         ),
-        shape = RoundedCornerShape(size = 12.dp),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 6.dp,
             pressedElevation = 2.dp
         ),
         modifier = Modifier
-            .padding(15.dp)
             .fillMaxWidth()
             .height(50.dp)
     ) {
-        Text(
-            text = buttonText.uppercase(),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp
-        )
+        if (loading) {
+            // Show circular progress bar when loading
+            CircularProgressIndicator(
+                color = Color.White,
+                modifier = Modifier.size(24.dp)
+            )
+        } else {
+            Text(
+                text = buttonText,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+        }
     }
 }
+
 
 
 
@@ -248,6 +307,7 @@ fun DrawImg(painter: Painter, contentDescription: String, modifier: Modifier = M
         painter = painter,
         contentDescription = contentDescription,
         modifier = modifier
+            .size(380.dp)
     )
 }
 

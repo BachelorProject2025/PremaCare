@@ -1,5 +1,6 @@
 package no.hiof.bachelor.premacare.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,20 +29,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
+
 
 @Composable
 fun RegisterScreen(toLogin: ()-> Unit) {
@@ -55,10 +62,19 @@ fun RegisterScreen(toLogin: ()-> Unit) {
         modifier = Modifier.fillMaxSize()
     ) {
 
-        Text( text = "REGISTERE",
-            color = Color(0xFF333333),
-            fontSize = 22.sp,
+        Text(
+            text = "Registrere",
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Oppgi nødvendige opplysninger om barnet og foresatt for registrering.",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
         )
 
         SpaceEm(10.dp)
@@ -148,7 +164,9 @@ fun RegisterScreen(toLogin: ()-> Unit) {
 
                 OutlinedTextField(
                     value = firebaseViewModel.chilDateOfBirth.value,
-                    onValueChange = { newValue -> firebaseViewModel.chilDateOfBirth.value = newValue },
+                    onValueChange = { newValue ->
+                        firebaseViewModel.chilDateOfBirth.value = newValue
+                    },
                     label = { Text("Barnet Er Født") },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
@@ -158,7 +176,6 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                 )
             }
         }
-
 
 
         // ----------Register------------------------
@@ -225,16 +242,35 @@ fun RegisterScreen(toLogin: ()-> Unit) {
         }
 
 
-        SpaceEm(40.dp)
+        SpaceEm(30.dp)
 
-        Button(onClick = { toLogin();
-            firebaseViewModel.registerUser()},
+        val isLoading = remember { mutableStateOf(false) }
+        var showToastMessage by remember { mutableStateOf<String?>(null) }
+        val coroutineScope = rememberCoroutineScope()
+
+        Button(
+            onClick = {
+                if (firebaseViewModel.isValidRegistration()) { // Legg til en valideringsmetode i ViewModel
+                    isLoading.value = true
+                    coroutineScope.launch {
+                        firebaseViewModel.registerUser { success ->
+                            isLoading.value = false
+                            showToastMessage = if (success as Boolean) {
+                                toLogin() // Naviger til login-skjermen
+                                "Registrering fullført!"
+                            } else {
+                                "Noe gikk galt. Prøv igjen."
+                            }
+                        }
+                    }
+                } else {
+                    showToastMessage = "Vennligst fyll inn alle felt riktig."
+                }
+            },
             colors = ButtonDefaults.buttonColors(
-                //0xFF4ABAB3 <-- denne vi har brukt men kke bra nokk for fargebilde
-                containerColor = Color(0xFF1565C0), //<-- Royal Blue vi tester ut denne!
+                containerColor = Color(0xFF1565C0), //<-- Royal Blue
                 contentColor = Color.White
             ),
-            shape = RoundedCornerShape(size = 12.dp),
             elevation = ButtonDefaults.buttonElevation(
                 defaultElevation = 6.dp,
                 pressedElevation = 2.dp
@@ -242,15 +278,30 @@ fun RegisterScreen(toLogin: ()-> Unit) {
             modifier = Modifier
                 .padding(15.dp)
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(50.dp),
+            enabled = !isLoading.value
         ) {
-            Text(
-
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp,
-                text = "SIGN UP")
+            if (isLoading.value) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp,
+                    text = "Registrer"
+                )
+            }
         }
+
+// Vis en toast hvis det er en melding
+        showToastMessage?.let { message ->
+            Toast.makeText(
+                LocalContext.current, message, Toast.LENGTH_LONG
+            ).show()
+            showToastMessage = null
+        }
+
     }
+
 }
 

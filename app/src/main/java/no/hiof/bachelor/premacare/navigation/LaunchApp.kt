@@ -1,6 +1,8 @@
 package no.hiof.bachelor.premacare.navigation
 
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,6 +57,7 @@ import no.hiof.bachelor.premacare.ui.screens.DashBoardScreen
 import no.hiof.bachelor.premacare.ui.screens.LogScreen
 import no.hiof.bachelor.premacare.ui.screens.LoginScreen
 import no.hiof.bachelor.premacare.ui.screens.NewEntry
+import no.hiof.bachelor.premacare.ui.screens.PasswordResetScreen
 import no.hiof.bachelor.premacare.ui.screens.RegisterScreen
 
 
@@ -247,7 +251,15 @@ fun LaunchApp(auth: FirebaseAuth) {
                         } },
                     newUser = {navController.navigate(AppScreens.Register.name)},
                     aboutUs = {navController.navigate(AppScreens.About.name)}
-                    , auth = auth )
+                    , auth = auth,
+                    reset = {navController.navigate(AppScreens.Reset.name)})
+            }
+
+            composable(AppScreens.Reset.name) {
+                isBottomBarVisible.value = false
+                isTopAppVisible.value = false
+                isFloatingActionButtonVisible.value = false
+               PasswordResetScreen(navController = navController)
             }
 
             composable(AppScreens.Register.name) {
@@ -314,3 +326,4 @@ fun SearchFloatingAction( toEntry: ()-> Unit) {
         Icon(imageVector = Icons.Default.Add, contentDescription =" Add Action" )
     }
 }
+

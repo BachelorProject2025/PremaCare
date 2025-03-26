@@ -2,11 +2,9 @@ package no.hiof.bachelor.premacare.ui.screens
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -28,11 +27,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -48,7 +46,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.model.WebsiteItem
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
-
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -118,8 +117,32 @@ fun DashBoardScreen(home: ()-> Unit) {
         SpaceEm(10.dp)
 
         WebsiteList(websites)
+
+        HorizontalLine()
+
+        CallButton()
     }
 
+}
+
+@Composable
+fun CallButton() {
+    val context = LocalContext.current
+    val phoneNumber = "tel:+4741282999" // Erstatt med telefonnummeret til sykehuset
+    val coroutineScope = rememberCoroutineScope()  // Husk å bruke CoroutineScope
+
+    Button(
+        onClick = {
+            coroutineScope.launch {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.parse(phoneNumber))
+                context.startActivity(intent)
+            }
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text("Ring Sykehuset", color = Color.White)
+    }
 }
 
 @Composable
@@ -372,7 +395,7 @@ fun WeightCard(
                 SpaceEm(15.dp)
 
                 Text(
-                    text = "$weight kg",
+                    text = "$weight Kg",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -385,6 +408,8 @@ fun WeightCard(
         }
     }
 }
+
+
 
 
 
