@@ -1,9 +1,6 @@
 package no.hiof.bachelor.premacare.viewModels
 
-import android.widget.Toast
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -46,40 +44,51 @@ class FirebaseViewModel : ViewModel() {
 
 
 
-    fun registerUser() {
+    fun registerUser(onResult: (Boolean) -> Unit) {
         val emailValue = email.value
         val passwordValue = password.value
         val parentNameValue = parentName.value
         val phoneNumerValue = phoneNumer.value
         val childsNameValue = childsName.value
         val chilDateOfBirthValue = chilDateOfBirth.value
+
         if (emailValue.isNotBlank() && passwordValue.isNotBlank() && childsNameValue.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    // Create the user in Firebase Authentication
-                    auth.createUserWithEmailAndPassword(emailValue, passwordValue).await()
+                    // Opprett bruker i Firebase Authentication
+                    val authResult = auth.createUserWithEmailAndPassword(emailValue, passwordValue).await()
+                    val currentUser = authResult.user
 
-                    // Store the username in Firestore under the 'users' collection
-                    val currentUser = auth.currentUser
-                    currentUser?.let { user ->
-                        val userId = user.uid
+                    if (currentUser != null) {
+                        val userId = currentUser.uid
                         val userMap = hashMapOf(
-                            "chilDateOfBirth" to chilDateOfBirth.value,
-                            "childsName" to childsName.value,
+                            "chilDateOfBirth" to chilDateOfBirthValue,
+                            "childsName" to childsNameValue,
                             "parentName" to parentNameValue,
                             "phoneNumer" to phoneNumerValue,
                             "email" to emailValue
                         )
+
+                        // Lagre brukerinfo i Firestore
                         firestore.collection("users").document(userId).set(userMap).await()
+
+                        // Oppdater UI på hovedtråden
+                        withContext(Dispatchers.Main) {
+                            fetchChildsName() // Henter barnets navn etter registrering
+                            onResult(true) // Registrering vellykket
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) { onResult(false) }
                     }
-                    fetchChildsName()
                 } catch (e: Exception) {
-                    // Handle registration failure
-                    println(e.message)
+                    withContext(Dispatchers.Main) { onResult(false) }
                 }
             }
+        } else {
+            onResult(false) // Feil hvis noen felt er tomme
         }
     }
+
 
     // Fetch the username from Firestore
     fun fetchChildsName() {
@@ -110,7 +119,7 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
-    fun loginUser() {
+    fun loginUser(onResult: (Boolean) -> Unit) {
         val emailValue = email.value
         val passwordValue = password.value
         if (emailValue.isNotBlank() && passwordValue.isNotBlank()) {
@@ -119,21 +128,40 @@ class FirebaseViewModel : ViewModel() {
                     auth.signInWithEmailAndPassword(emailValue, passwordValue).await()
                     fetchChildsName()
 
+                    // Notify success
+                    withContext(Dispatchers.Main) {
+                        onResult(true)
+                    }
                 } catch (e: Exception) {
                     // Handle login failure
+                    withContext(Dispatchers.Main) {
+                        onResult(false)
+                    }
                     println(e.message)
                 }
             }
+        } else {
+            onResult(false)
         }
     }
-
-
 
     fun logOut() {
         auth.signOut()
     }
 
+    fun resetPassword(email: String, onResult: (Boolean) -> Unit) {
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                onResult(task.isSuccessful)
+            }
+    }
 
-
+    fun isValidRegistration(): Boolean {
+        return email.value.isNotBlank() && password.value.isNotBlank()
+    }
 
 }
+
+
+
+
