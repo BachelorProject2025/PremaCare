@@ -1,7 +1,10 @@
 package no.hiof.bachelor.premacare.viewModels
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +12,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.withContext
+import no.hiof.bachelor.premacare.model.FeedingRecord
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 
@@ -41,6 +46,27 @@ class FirebaseViewModel : ViewModel() {
 
     private var _memberSince = mutableStateOf("")
     val memberSince = _memberSince
+
+    // ---------for feedingRecords----------------
+
+    private var _amount = mutableStateOf(0)
+    val amount = _amount
+
+    private var _time = mutableStateOf("")
+    val time = _time
+
+    private var _pee = mutableStateOf(false)
+    val pee = _pee
+
+    private var _poo = mutableStateOf(false)
+    val poo = _poo
+
+    private var _feedingMethod = mutableStateOf("")
+    val feedingMethod = _feedingMethod
+
+    private var _comment = mutableStateOf("")
+    val comment = _comment
+
 
 
 
@@ -160,7 +186,71 @@ class FirebaseViewModel : ViewModel() {
         return email.value.isNotBlank() && password.value.isNotBlank()
     }
 
+
+    //------------------ Feeding records ----------------------
+
+    fun saveFeedingRecord(amount: Int, pee: Boolean, poo: Boolean, feedingMethod: String, comment: String) {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            val feedingRecord = FeedingRecord(
+                amount = amount,
+                time = Timestamp.now(), // Bruker Firestore sin Timestamp
+                date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()), // Dagens dato som String
+                pee = pee,
+                poo = poo,
+                feedingMethod = feedingMethod,
+                comment = comment
+            )
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    firestore.collection("users")
+                        .document(userId)
+                        .collection("feedingRecords")
+                        .add(feedingRecord)
+                        .await()
+                } catch (e: Exception) {
+                    println("Error saving feeding record: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private val _currentIntake = MutableLiveData<Float>()
+    val currentIntake: LiveData<Float> = _currentIntake
+
+    fun getTotalAmountForToday() {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) // Henter dagens dato
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val snapshot = firestore.collection("users")
+                        .document(userId)
+                        .collection("feedingRecords")
+                        .whereEqualTo("date", todayDate) // Filtrerer etter dagens dato
+                        .get()
+                        .await()
+
+                    val totalAmount = snapshot.documents.sumOf { it.getLong("amount")?.toInt() ?: 0 }
+                    _currentIntake.postValue(totalAmount.toFloat())
+
+                } catch (e: Exception) {
+                    println("Error fetching total amount: ${e.message}")
+                }
+            }
+        }
+    }
+
 }
+
+
+
+
+
 
 
 

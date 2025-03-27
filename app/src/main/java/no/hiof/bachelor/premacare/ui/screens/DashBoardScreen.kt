@@ -28,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +54,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DashBoardScreen(home: ()-> Unit) {
-    val weight = 5.5f // Eks vekt i KG (later from Firebase)
-    val currentIntake = 7.75f // Eks melkeintak (later from Firebase)
-
     val firebaseViewModel: FirebaseViewModel = viewModel()
+    val weight = 2000f // Eks vekt i gram (later from Firebase)
+   // val currentIntake = 7.75f // Eks melkeintak (later from Firebase)
+
+    val currentIntake by firebaseViewModel.currentIntake.observeAsState(0.0f) // Default value
+
+    // Kall funksjonen for å hente totalt inntak for i dag når composable-en først blir lastet
+    LaunchedEffect(Unit) {
+        firebaseViewModel.getTotalAmountForToday()
+    }
+
+
 
 
     // igjen en test for å hente barnenavn
@@ -296,7 +306,7 @@ val websites = listOf(
 
     )
 
-// Milk calcutation based on weight
+// Milk total basert på barnets vekt, 15% av vekt er bra ->  grønn, 12% er ok -> gul under 12% er -> rød
 @Composable
 fun DashboardCard(
     currentIntake: Float,
@@ -304,21 +314,26 @@ fun DashboardCard(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val min = 0.12f * (weight * 10)
-    val max = 0.15f * (weight * 10)
+    val min = 0.12f * weight
+    val max = 0.15f * weight
 
+
+    // Kalkulasjon progress basert på currentIntake og max value
     val progress = (currentIntake / max).coerceIn(0f, 1f)
     val progressColor = if (currentIntake >= min) Color.Green else Color.Red
     val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
 
-    LaunchedEffect(progress) {
+
+    // Oppdatert animasjons prgress når currentIntake forandres
+    LaunchedEffect(currentIntake) {
+
         animatedProgress.animateTo(progress, animationSpec = tween(durationMillis = 1000))
     }
 
     Card(
         modifier = Modifier
             .width(200.dp)
-            .height(200.dp) // Ensuring it doesn't stretch
+            .height(200.dp)
             .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -330,7 +345,7 @@ fun DashboardCard(
             contentAlignment = Alignment.Center
         ) {
             Canvas(
-                modifier = Modifier.size(140.dp) // Restricting size of the progress bar
+                modifier = Modifier.size(140.dp)
             ) {
                 val strokeWidth = 16f
 
@@ -350,7 +365,6 @@ fun DashboardCard(
                     style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                 )
             }
-
 
             Text(
                 text = "${currentIntake} ml",
@@ -385,7 +399,7 @@ fun WeightCard(
 
             Column {
                 Text(
-                    text = "Barnets Vekt", // Displays the weight variable correctly
+                    text = "Barnets Vekt",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
@@ -395,7 +409,7 @@ fun WeightCard(
                 SpaceEm(15.dp)
 
                 Text(
-                    text = "$weight Kg",
+                    text = "$weight G",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),

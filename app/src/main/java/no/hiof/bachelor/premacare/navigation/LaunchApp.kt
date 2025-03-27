@@ -287,7 +287,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isBottomBarVisible.value = true
                 isTopAppVisible.value = true
                 isFloatingActionButtonVisible.value = true
-                NewEntry()
+                NewEntry(ToDash = {navController.navigate(AppScreens.DashBoard.name)})
             }
 
         }
