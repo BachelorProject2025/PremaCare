@@ -67,7 +67,7 @@ fun NewEntry(ToDash: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            text = "Feeding Amount: ${firebaseViewModel.amount.value} ml")
+            text = "Mengde: ${firebaseViewModel.amount.value} ml")
 
         Slider(
             value = firebaseViewModel.amount.value.toFloat(),
@@ -75,6 +75,7 @@ fun NewEntry(ToDash: () -> Unit) {
             valueRange = 0f..170f
         )
 
+        HorizontalLine()
         Spacer(modifier = Modifier.height(26.dp))
 
 
@@ -96,6 +97,8 @@ fun NewEntry(ToDash: () -> Unit) {
             )
         }
 
+
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -115,7 +118,7 @@ fun NewEntry(ToDash: () -> Unit) {
             )
         }
 
-
+        HorizontalLine()
         Spacer(modifier = Modifier.height(26.dp))
 
         // Buttons  Row
@@ -166,7 +169,9 @@ fun NewEntry(ToDash: () -> Unit) {
             }
         }
 
-        Spacer(modifier = Modifier.height(45.dp))
+        HorizontalLine()
+
+        Spacer(modifier = Modifier.height(25.dp))
 
         // TextField for Comment
         TextField(
@@ -176,7 +181,9 @@ fun NewEntry(ToDash: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(50.dp))
+
+
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Save Button
         Button(
