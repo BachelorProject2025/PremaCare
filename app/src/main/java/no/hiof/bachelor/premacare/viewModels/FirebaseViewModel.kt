@@ -13,9 +13,11 @@ import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.withContext
 import no.hiof.bachelor.premacare.model.FeedingRecord
+import no.hiof.bachelor.premacare.model.Message
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 
 class FirebaseViewModel : ViewModel() {
@@ -66,6 +68,10 @@ class FirebaseViewModel : ViewModel() {
 
     private var _comment = mutableStateOf("")
     val comment = _comment
+
+    // -------- Message --------
+    private val _messages = MutableLiveData<List<Message>>()
+    val messages: LiveData<List<Message>> = _messages
 
 
 
@@ -245,7 +251,50 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+    //------------------ Message ----------------------
+    fun fetchMessages() {
+        val userId = auth.currentUser?.uid ?: return
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val messageList = firestore.collection("users")
+                    .document(userId)
+                    .collection("messages")
+                    .orderBy("timestamp")
+                    .get()
+                    .await()
+                    .toObjects(Message::class.java)
+
+                withContext(Dispatchers.Main) {
+                    _messages.value = messageList
+                }
+            } catch (e: Exception) {
+                println("Error fetching messages: ${e.message}")
+            }
+        }
+    }
+
+    fun sendMessage(messageText: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val message = Message(senderId = userId, message = messageText)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("messages")
+                    .document(UUID.randomUUID().toString())
+                    .set(message)
+                    .await()
+
+                fetchMessages() // Oppdater listen etter sending
+            } catch (e: Exception) {
+                println("Error sending message: ${e.message}")
+            }
+        }
+    }
 }
+
+
 
 
 
