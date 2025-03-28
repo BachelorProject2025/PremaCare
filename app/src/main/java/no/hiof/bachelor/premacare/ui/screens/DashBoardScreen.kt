@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +50,11 @@ import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.model.WebsiteItem
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @Composable
@@ -317,17 +322,31 @@ fun DashboardCard(
     val min = 0.12f * weight
     val max = 0.15f * weight
 
-
     // Kalkulasjon progress basert på currentIntake og max value
     val progress = (currentIntake / max).coerceIn(0f, 1f)
     val progressColor = if (currentIntake >= min) Color.Green else Color.Red
     val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
 
-
-    // Oppdatert animasjons prgress når currentIntake forandres
+    // Oppdatert animasjons progress når currentIntake forandres
     LaunchedEffect(currentIntake) {
-
         animatedProgress.animateTo(progress, animationSpec = tween(durationMillis = 1000))
+    }
+
+    // Sjekk dato og tilbakestill currentIntake ved midnatt
+    val currentDate = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) }
+    var lastResetDate by remember { mutableStateOf(currentDate) }
+
+    // Hvis datoen har endret seg, tilbakestill currentIntake til 0
+    if (currentDate != lastResetDate) {
+        // Dette betyr at det er en ny dag
+        LaunchedEffect(currentDate) {
+            // Tilbakestill når ny dag begynner
+            // Denne koden kan tilbakestille Firebase, eller annen logikk du måtte ha
+            // For nå bare tilbakestiller vi currentIntake
+            // (Sett opp Firebase eller annen tilbakestilling her om nødvendig)
+            // currentIntake = 0 // For demo formål
+            lastResetDate = currentDate // Oppdater datoen
+        }
     }
 
     Card(
