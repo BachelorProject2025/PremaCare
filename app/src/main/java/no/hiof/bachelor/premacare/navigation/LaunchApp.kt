@@ -85,20 +85,6 @@ fun LaunchApp(auth: FirebaseAuth) {
     Scaffold(topBar = {
         if (isTopAppVisible.value) {
             // Define the gradient
-            val gradient = Brush.linearGradient(
-                colors = listOf(
-                    //0xFFA040C0  livlig lilla
-                    //0xFF602070 En dyp mørk lilla
-                    //0xFF50D4F2 cyan/blue
-                    //0xFF3BA3C0 mørkere cyan/blue
-                    // 0xFFE8F5E9 lys grønnaktig farge
-                    // 0xFFC8E6C9 litt mørkere grønn
-
-                    Color(0xFF50D4F2), //cyan/blue
-                    Color(0xFF3BA3C0) // mørkere cyan/blue
-                )
-            )
-
             /*
             val title = when (currentRoute) {
                 AppScreens.Login.name -> ""
@@ -113,7 +99,7 @@ fun LaunchApp(auth: FirebaseAuth) {
 // that fills the top bar area.
             Column(
                 modifier = Modifier
-                    .background(gradient)
+                    .background(Color(0xFF50D4F2))
                     .fillMaxWidth()
                     .padding(
                         top = WindowInsets.statusBars
@@ -311,7 +297,7 @@ fun LaunchApp(auth: FirebaseAuth) {
             composable(AppScreens.Message.name) {
                 isBottomBarVisible.value = true
                 isTopAppVisible.value = true
-                isFloatingActionButtonVisible.value = true
+                isFloatingActionButtonVisible.value = false // <-- Fjerner FAB(floating action btn) i denne screenen for bedre skjerm plass
                 MessageScreen()
             }
 

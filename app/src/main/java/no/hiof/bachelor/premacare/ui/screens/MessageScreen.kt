@@ -2,31 +2,35 @@ package no.hiof.bachelor.premacare.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 @Composable
 fun MessageScreen() {
+    val firebaseViewModel: FirebaseViewModel = viewModel()
+    val messages by firebaseViewModel.messages.observeAsState(emptyList())
     var message by remember { mutableStateOf(TextFieldValue()) }
-    val messages = remember { mutableStateListOf("") }
+
+    LaunchedEffect(Unit) {
+        firebaseViewModel.fetchMessages() // Hent meldinger ved oppstart
+    }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Column(
-            modifier = Modifier.weight(1f).fillMaxWidth()
-        ) {
-            messages.forEach { msg ->
-                MessageBubble(text = msg)
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(messages) { msg ->
+                MessageBubble(text = msg.message)
                 Spacer(modifier = Modifier.height(4.dp))
             }
         }
@@ -42,24 +46,25 @@ fun MessageScreen() {
                 placeholder = { Text("Skriv en melding...") }
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            //Spacer(modifier = Modifier.width(8.dp))
 
 
         }
-
-        Button(modifier = Modifier
-            .fillMaxWidth(),
+        Button(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             onClick = {
                 if (message.text.isNotBlank()) {
-                    messages.add(message.text)
+                    firebaseViewModel.sendMessage(message.text)
                     message = TextFieldValue()
                 }
-            },
-            shape = RoundedCornerShape(50)
+            }
         ) {
             Text("Send")
         }
+
     }
 }
 
