@@ -70,12 +70,17 @@ fun MessageScreen() {
 
 @Composable
 fun MessageBubble(text: String) {
+    val firebaseViewModel: FirebaseViewModel = viewModel()
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            //pale purple 0xFFE1BEE7
+            //light coral 0xFFFFD4D1
+            // light blue 0xFFBBDEFB
             .background(Color(0xFFBBDEFB), shape = RoundedCornerShape(8.dp))
             .padding(12.dp)
     ) {
-        Text(text, color = Color.Black)
+
+            Text(text, color = Color.Black)
     }
 }

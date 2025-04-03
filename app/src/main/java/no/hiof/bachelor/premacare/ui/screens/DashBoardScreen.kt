@@ -60,14 +60,17 @@ import java.util.Locale
 @Composable
 fun DashBoardScreen(home: ()-> Unit) {
     val firebaseViewModel: FirebaseViewModel = viewModel()
-    val weight = 2000f // Eks vekt i gram (later from Firebase)
-   // val currentIntake = 7.75f // Eks melkeintak (later from Firebase)
+
+
 
     val currentIntake by firebaseViewModel.currentIntake.observeAsState(0.0f) // Default value
+    val currentWeight by firebaseViewModel.lastWeight.observeAsState(0.0f)
 
     // Kall funksjonen for å hente totalt inntak for i dag når composable-en først blir lastet
+
     LaunchedEffect(Unit) {
         firebaseViewModel.getTotalAmountForToday()
+        firebaseViewModel.getLastWeight()
     }
 
 
@@ -112,12 +115,13 @@ fun DashBoardScreen(home: ()-> Unit) {
         Row {
             DashboardCard(
                 currentIntake = currentIntake,
-                weight = weight
+                weight = currentWeight.toFloat()
+
             )
 
             WeightCard(
                 currentIntake = currentIntake,
-                weight = weight
+                weight = currentWeight.toFloat()
             )
 
         }
@@ -315,12 +319,15 @@ val websites = listOf(
 @Composable
 fun DashboardCard(
     currentIntake: Float,
-    weight: Float,
-    modifier: Modifier = Modifier
+    weight : Float,
+    modifier: Modifier = Modifier,
+
 ) {
     val context = LocalContext.current
-    val min = 0.12f * weight
-    val max = 0.15f * weight
+
+
+    val min = if (weight > 0) 0.12f * weight else 0f
+    val max = if (weight > 0) 0.15f * weight else 1f
 
     // Kalkulasjon progress basert på currentIntake og max value
     val progress = (currentIntake / max).coerceIn(0f, 1f)
