@@ -290,7 +290,7 @@ fun LaunchApp(auth: FirebaseAuth) {
             composable(AppScreens.NewEntry.name) {
                 isBottomBarVisible.value = true
                 isTopAppVisible.value = true
-                isFloatingActionButtonVisible.value = true
+                isFloatingActionButtonVisible.value = false
                 NewEntry(ToDash = {navController.navigate(AppScreens.DashBoard.name)})
             }
 

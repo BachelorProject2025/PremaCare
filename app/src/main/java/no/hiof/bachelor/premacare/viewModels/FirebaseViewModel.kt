@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.withContext
 import no.hiof.bachelor.premacare.model.FeedingRecord
 import no.hiof.bachelor.premacare.model.Message
@@ -68,6 +69,9 @@ class FirebaseViewModel : ViewModel() {
 
     private var _comment = mutableStateOf("")
     val comment = _comment
+
+    private var _weight = mutableStateOf(0)
+    val weight = _weight
 
     // -------- Message --------
     private val _messages = MutableLiveData<List<Message>>()
@@ -195,12 +199,13 @@ class FirebaseViewModel : ViewModel() {
 
     //------------------ Feeding records ----------------------
 
-    fun saveFeedingRecord(amount: Int, pee: Boolean, poo: Boolean, feedingMethod: String, comment: String) {
+    fun saveFeedingRecord(amount: Int,weight: Int, pee: Boolean, poo: Boolean, feedingMethod: String, comment: String) {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
             val userId = user.uid
             val feedingRecord = FeedingRecord(
                 amount = amount,
+                weight = weight,
                 time = Timestamp.now(), // Bruker Firestore sin Timestamp
                 date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()), // Dagens dato som String
                 pee = pee,
@@ -250,6 +255,35 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
+
+    private val _lastWeight = MutableLiveData<Int>()
+    val lastWeight: LiveData<Int> = _lastWeight
+
+    fun getLastWeight() {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val snapshot = firestore.collection("users")
+                        .document(userId)
+                        .collection("feedingRecords")
+                        .orderBy("time", Query.Direction.DESCENDING) // Match field name in Firestore
+                        .limit(1)
+                        .get()
+                        .await()
+
+                    val lastWeight = snapshot.documents.firstOrNull()?.getLong("weight")?.toInt()
+                    _lastWeight.postValue(lastWeight ?: 0)
+
+                } catch (e: Exception) {
+                    println("Error fetching last weight: ${e.message}")
+                }
+            }
+        }
+    }
+
 
     //------------------ Message ----------------------
     fun fetchMessages() {

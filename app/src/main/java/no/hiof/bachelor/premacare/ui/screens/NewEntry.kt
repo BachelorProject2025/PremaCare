@@ -9,20 +9,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,17 +53,17 @@ fun NewEntry(ToDash: () -> Unit) {
     ) {
 
         Text(
-            text = "Legg til ny fôring",
+            text = "Fôring & helse",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 75.dp)
+            modifier = Modifier.padding(horizontal = 95.dp)
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Fyll ut detaljene for fôringen din. Sørg for at all informasjon er korrekt før du lagrer.",
+            text = "Sørg for at all informasjon er korrekt før du lagrer.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -74,48 +83,51 @@ fun NewEntry(ToDash: () -> Unit) {
             onValueChange = { firebaseViewModel.amount.value = it.toInt() },
             valueRange = 0f..170f
         )
+// test for vekt
+        Text(
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            text = "Vekt av barn: ${firebaseViewModel.weight.value} gram")
+
+        Slider(
+            value = firebaseViewModel.weight.value.toFloat(),
+            onValueChange = { firebaseViewModel.weight.value = it.toInt() },
+            valueRange = 550f..5000f,
+            colors = SliderDefaults.colors(
+                thumbColor = Color( 0xFF50D4F2),
+                activeTrackColor = Color( 0xFF50D4F2), // Active track color
+                inactiveTrackColor = Color.LightGray // Inactive track color
+            )
+
+        )
+
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         HorizontalLine()
         Spacer(modifier = Modifier.height(26.dp))
 
 
-        // RadioButtons for Pee and Poo
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             Text("Urinasjon")
             RadioButton(
                 selected = firebaseViewModel.pee.value,
                 onClick = { firebaseViewModel.pee.value = true }
             )
-            Text(" Ikke urinasjon")
-            RadioButton(
-                selected = !firebaseViewModel.pee.value,
-                onClick = { firebaseViewModel.pee.value = false }
-            )
-        }
 
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             Text("Avføring")
             RadioButton(
                 selected = firebaseViewModel.poo.value,
                 onClick = { firebaseViewModel.poo.value = true }
             )
-            Text("Ikke avføring")
-            RadioButton(
-                selected = !firebaseViewModel.poo.value,
-                onClick = { firebaseViewModel.poo.value = false }
-            )
+
         }
 
         HorizontalLine()
@@ -190,6 +202,7 @@ fun NewEntry(ToDash: () -> Unit) {
             onClick = {
                 firebaseViewModel.saveFeedingRecord(
                     amount = firebaseViewModel.amount.value,
+                    weight = firebaseViewModel.weight.value,
                     pee = firebaseViewModel.pee.value,
                     poo = firebaseViewModel.poo.value,
                     feedingMethod = firebaseViewModel.feedingMethod.value,
