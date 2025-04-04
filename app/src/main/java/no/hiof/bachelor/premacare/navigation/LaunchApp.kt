@@ -65,6 +65,7 @@ import no.hiof.bachelor.premacare.ui.screens.MessageScreen
 import no.hiof.bachelor.premacare.ui.screens.NewEntry
 import no.hiof.bachelor.premacare.ui.screens.PasswordResetScreen
 import no.hiof.bachelor.premacare.ui.screens.RegisterScreen
+import no.hiof.bachelor.premacare.ui.screens.SettingsScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,7 +150,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                     actions = {
                         if (currentUser != null){
                             IconButton(onClick = {
-
+                                navController.navigate(AppScreens.Settings.name)
 
                             }) {
                                 Icon(
@@ -284,7 +285,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isBottomBarVisible.value = true
                 isTopAppVisible.value = true
                 isFloatingActionButtonVisible.value = true
-                DashBoardScreen(home = {navController.navigate(AppScreens.Login.name)})
+                DashBoardScreen()
             }
 
             composable(AppScreens.NewEntry.name) {
@@ -299,6 +300,14 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isTopAppVisible.value = true
                 isFloatingActionButtonVisible.value = false // <-- Fjerner FAB(floating action btn) i denne screenen for bedre skjerm plass
                 MessageScreen()
+            }
+
+            composable(AppScreens.Settings.name) {
+                isBottomBarVisible.value = true
+                isTopAppVisible.value = true
+                isFloatingActionButtonVisible.value = false
+                SettingsScreen({navController.navigate(AppScreens.Reset.name)},
+                    home = {navController.navigate(AppScreens.Login.name)})
             }
 
         }
