@@ -58,7 +58,7 @@ import java.util.Locale
 
 
 @Composable
-fun DashBoardScreen(home: ()-> Unit) {
+fun DashBoardScreen() {
     val firebaseViewModel: FirebaseViewModel = viewModel()
 
 
@@ -85,12 +85,6 @@ fun DashBoardScreen(home: ()-> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
 
-        // bare for og få logget ut slik at vi for testet. denne må legges et annet sted og penere gjordt
-        Text("Logg ut",
-            modifier = Modifier.clickable {
-                firebaseViewModel.logOut()
-                home()
-            })
 
         SpaceEm(10.dp)
 
