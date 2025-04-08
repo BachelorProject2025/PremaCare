@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
@@ -25,13 +24,14 @@ fun MessageScreen() {
 
     LaunchedEffect(Unit) {
         firebaseViewModel.fetchMessages() // Hent meldinger ved oppstart
+        firebaseViewModel.fetchParentName()
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { msg ->
-                MessageBubble(text = msg.message)
-                Spacer(modifier = Modifier.height(4.dp))
+                MessageBubble(text = msg.message, senderId = msg.senderid, firebaseViewModel.parentName.value)
+                Spacer(modifier = Modifier.height(7.dp))
             }
         }
 
@@ -45,11 +45,8 @@ fun MessageScreen() {
                 modifier = Modifier.weight(1f),
                 placeholder = { Text("Skriv en melding...") }
             )
-
-            //Spacer(modifier = Modifier.width(8.dp))
-
-
         }
+
         Button(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
             modifier = Modifier
@@ -64,23 +61,37 @@ fun MessageScreen() {
         ) {
             Text("Send")
         }
-
     }
 }
 
 @Composable
-fun MessageBubble(text: String) {
-    val firebaseViewModel: FirebaseViewModel = viewModel()
+fun MessageBubble(text: String, senderId: String, parentName: String?) {
+    // Set background color based on senderId
+    val backgroundColor = if (senderId == "Sykepleier") {
+        Color(0xFFEEEEEE) // Light grey for "Sykepleier"
+    } else {
+        Color(0xFFBBDEFB) // Light blue for others (parents)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            //pale purple 0xFFE1BEE7
-            //light coral 0xFFFFD4D1
-            // light blue 0xFFBBDEFB
-            .background(Color(0xFFBBDEFB), shape = RoundedCornerShape(8.dp))
+            .background(backgroundColor, shape = RoundedCornerShape(8.dp))
             .padding(12.dp)
     ) {
+        Column {
+            // Add sender's name in the top corner
+            Text(
+                text = if (senderId == "Sykepleier") "Sykepleier" else parentName ?: "Unknown",
+                style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
+                modifier = Modifier.align(Alignment.Start)
+            )
 
+            Spacer(modifier = Modifier.height(4.dp)) // Space below the sender's name
+
+            // Main message text
             Text(text, color = Color.Black)
+        }
     }
 }
+

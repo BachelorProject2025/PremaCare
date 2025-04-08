@@ -74,8 +74,8 @@ class FirebaseViewModel : ViewModel() {
     val weight = _weight
 
     // -------- Message --------
-    private val _messages = MutableLiveData<List<Message>>()
-    val messages: LiveData<List<Message>> = _messages
+   // private val _messages = MutableLiveData<List<Message>>()
+   // val messages: LiveData<List<Message>> = _messages
 
 
 
@@ -152,6 +152,22 @@ class FirebaseViewModel : ViewModel() {
             // Format the date
             val dateFormat = SimpleDateFormat("MMMM d, yyyy", Locale.getDefault())
             _memberSince.value = dateFormat.format(creationTimestamp)
+        }
+    }
+
+    fun fetchParentName() {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val userSnapshot = firestore.collection("users").document(userId).get().await()
+                    _parentName.value =
+                        userSnapshot.getString("parentName") ?: "" // Fetch parent name
+                } catch (e: Exception) {
+                    println(e.message)
+                }
+            }
         }
     }
 
@@ -286,6 +302,34 @@ class FirebaseViewModel : ViewModel() {
 
 
     //------------------ Message ----------------------
+
+
+
+   //fun fetchMessages() {
+   //    val userId = auth.currentUser?.uid ?: return
+   //    CoroutineScope(Dispatchers.IO).launch {
+   //        try {
+   //            val messageList = firestore.collection("users")
+   //                .document(userId)
+   //                .collection("messages")
+   //                .orderBy("timestamp")
+   //                .get()
+   //                .await()
+   //                .toObjects(Message::class.java)
+
+   //            withContext(Dispatchers.Main) {
+   //                _messages.value = messageList
+   //            }
+   //        } catch (e: Exception) {
+   //            println("Error fetching messages: ${e.message}")
+   //        }
+   //    }
+   //}
+
+    private val _messages = MutableLiveData<List<Message>>()
+    val messages: LiveData<List<Message>> get() = _messages
+
+    // Funksjon for å hente meldinger
     fun fetchMessages() {
         val userId = auth.currentUser?.uid ?: return
         CoroutineScope(Dispatchers.IO).launch {
@@ -299,6 +343,7 @@ class FirebaseViewModel : ViewModel() {
                     .toObjects(Message::class.java)
 
                 withContext(Dispatchers.Main) {
+                    // Updating LiveData
                     _messages.value = messageList
                 }
             } catch (e: Exception) {
@@ -309,7 +354,7 @@ class FirebaseViewModel : ViewModel() {
 
     fun sendMessage(messageText: String) {
         val userId = auth.currentUser?.uid ?: return
-        val message = Message(senderId = userId, message = messageText)
+        val message = Message(senderid = userId, message = messageText)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
