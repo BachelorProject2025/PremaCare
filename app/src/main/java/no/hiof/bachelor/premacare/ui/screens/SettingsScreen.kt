@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,9 +45,11 @@ fun SettingsScreen(
     var darkModeEnabled by remember { mutableStateOf(false) }
     val firebaseViewModel: FirebaseViewModel = viewModel()
 
+
+
     Text(
         text = "Innstillinger",
-        style = MaterialTheme.typography.headlineMedium,
+        style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(horizontal = 130.dp)
@@ -60,7 +63,7 @@ fun SettingsScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        SpaceEm(65.dp)
+        SpaceEm(45.dp)
 
         // Logge ut
         SettingItem(
@@ -78,14 +81,7 @@ fun SettingsScreen(
         )
 
         
-        // Dark Mode Toggle
-        SettingItem(
-            title = "Dark Mode",
-            icon = Icons.Default.DarkMode,
-            action = {
-                Switch(checked = darkModeEnabled, onCheckedChange = { darkModeEnabled = it })
-            }
-        )
+
 
         // Change Password
         SettingItem(

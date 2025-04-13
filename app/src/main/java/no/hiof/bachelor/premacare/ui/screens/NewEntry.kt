@@ -54,7 +54,7 @@ fun NewEntry(ToDash: () -> Unit) {
 
         Text(
             text = "Fôring & helse",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 95.dp)
