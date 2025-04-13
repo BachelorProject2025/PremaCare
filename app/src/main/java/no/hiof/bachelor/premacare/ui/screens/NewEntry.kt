@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,19 +41,15 @@ import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 @Composable
 fun NewEntry(ToDash: () -> Unit) {
-    // Heljar sin ....:P
-    // I appens floating action button, er det lagt til denne screenen da det er hoved funksjonen til applikasjoenen.
-    // for å følge gidelines til matirial design skal dette være slik.
     val firebaseViewModel: FirebaseViewModel = viewModel()
 
 
-    Column(
-        modifier = Modifier.run {
-            padding(16.dp)
-                .fillMaxSize()
-        }
-    ) {
 
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()
+    ) {
         Text(
             text = "Fôring & helse",
             style = MaterialTheme.typography.headlineSmall,
@@ -76,46 +74,71 @@ fun NewEntry(ToDash: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            text = "Mengde: ${firebaseViewModel.amount.value} ml")
+            text = "Mengde melk: ${firebaseViewModel.amount.value} ml"
+        )
 
         Slider(
             value = firebaseViewModel.amount.value.toFloat(),
             onValueChange = { firebaseViewModel.amount.value = it.toInt() },
             valueRange = 0f..170f
         )
-// test for vekt
+
+        // Hent siste vekt fra Firebase ViewModel
+        LaunchedEffect(Unit) {
+            firebaseViewModel.getLastWeight()
+        }
+
+        val lastWeight by firebaseViewModel.lastWeight.observeAsState(0) // Standardverdi 0
+        var weightInput by remember { mutableStateOf("") }
+
+// Når lastWeight endres, oppdater både input-feltet OG ViewModel-verdien
+        LaunchedEffect(lastWeight) {
+            if (lastWeight > 0 && weightInput.isEmpty()) {
+                weightInput = lastWeight.toString()
+                firebaseViewModel.weight.value = lastWeight // <- VIKTIG! Sett vekten her
+            }
+        }
+
         Text(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            text = "Vekt av barn: ${firebaseViewModel.weight.value} gram")
+            text = "Vekt av barn: $lastWeight gram"
+        )
 
-        Slider(
-            value = firebaseViewModel.weight.value.toFloat(),
-            onValueChange = { firebaseViewModel.weight.value = it.toInt() },
-            valueRange = 550f..5000f,
-            colors = SliderDefaults.colors(
-                thumbColor = Color( 0xFF50D4F2),
-                activeTrackColor = Color( 0xFF50D4F2), // Active track color
-                inactiveTrackColor = Color.LightGray // Inactive track color
-            )
+        Spacer(modifier = Modifier.height(15.dp))
 
+        TextField(
+            value = weightInput,
+            onValueChange = { input ->
+                weightInput = input
+
+                input.toIntOrNull()?.let {
+                    if (it in 550..5000) {
+                        firebaseViewModel.weight.value = it
+                    }
+                }
+            },
+            placeholder = {
+                Text(
+                    text = if (lastWeight > 0) "$lastWeight" else "Skriv inn vekt i gram"
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
 
         Spacer(modifier = Modifier.height(16.dp))
-
         HorizontalLine()
         Spacer(modifier = Modifier.height(26.dp))
-
-
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Text("Urinasjon")
             RadioButton(
                 selected = firebaseViewModel.pee.value,
@@ -127,18 +150,15 @@ fun NewEntry(ToDash: () -> Unit) {
                 selected = firebaseViewModel.poo.value,
                 onClick = { firebaseViewModel.poo.value = true }
             )
-
         }
 
         HorizontalLine()
         Spacer(modifier = Modifier.height(26.dp))
 
-        // Buttons  Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Bryst Button
             TextButton(
                 onClick = { firebaseViewModel.feedingMethod.value = "Bryst" },
                 modifier = Modifier
@@ -152,7 +172,6 @@ fun NewEntry(ToDash: () -> Unit) {
                 Text("Bryst")
             }
 
-            // Sonde Button
             TextButton(
                 onClick = { firebaseViewModel.feedingMethod.value = "Sonde" },
                 modifier = Modifier
@@ -166,7 +185,6 @@ fun NewEntry(ToDash: () -> Unit) {
                 Text("Sonde")
             }
 
-            // Flaske Button
             TextButton(
                 onClick = { firebaseViewModel.feedingMethod.value = "Flaske" },
                 modifier = Modifier
@@ -182,10 +200,8 @@ fun NewEntry(ToDash: () -> Unit) {
         }
 
         HorizontalLine()
-
         Spacer(modifier = Modifier.height(25.dp))
 
-        // TextField for Comment
         TextField(
             value = firebaseViewModel.comment.value,
             onValueChange = { firebaseViewModel.comment.value = it },
@@ -193,11 +209,9 @@ fun NewEntry(ToDash: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
 
-
-
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Save Button
+        // Knappen din er BEVART nøyaktig
         Button(
             onClick = {
                 firebaseViewModel.saveFeedingRecord(
@@ -209,16 +223,17 @@ fun NewEntry(ToDash: () -> Unit) {
                     comment = firebaseViewModel.comment.value
                 )
                 ToDash()
-
             },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0),//<- Royal Blue
-                contentColor = Color.White),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF1565C0),
+                contentColor = Color.White
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-
         ) {
             Text("Lagre")
         }
     }
 }
+

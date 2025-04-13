@@ -86,16 +86,6 @@ fun LaunchApp(auth: FirebaseAuth) {
 
     Scaffold(topBar = {
         if (isTopAppVisible.value) {
-            // Define the gradient
-            /*
-            val title = when (currentRoute) {
-                AppScreens.Login.name -> ""
-                AppScreens.Register.name -> ""
-                AppScreens.Log.name -> "Logg"
-                AppScreens.DashBoard.name -> "Dashboard"
-                AppScreens.NewEntry.name -> "Fôring"
-                else -> "Prema Care"
-            }*/
 
             Column(
                 //.background(Color(0xFF50D4F2))
@@ -110,17 +100,17 @@ fun LaunchApp(auth: FirebaseAuth) {
             ) {
                 CenterAlignedTopAppBar(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Transparent, // Make the AppBar container transparent
+                        containerColor = Color.Transparent,
                         titleContentColor = Color.Black
                     ),
                     title = {
                         when (currentRoute) {
                             AppScreens.Login.name, AppScreens.Register.name -> {
-                                // You can leave this empty or place something custom here
+
                             }
 
                             else -> {
-                                // Display an image (logo) in the top bar
+
                                 Image(
                                     painter = painterResource(id = R.drawable.prema_care_white),
                                     contentDescription = "App Logo",
