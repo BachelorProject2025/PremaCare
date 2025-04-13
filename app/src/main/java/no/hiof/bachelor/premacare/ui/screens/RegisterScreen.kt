@@ -60,6 +60,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxSize()
+            .padding(16.dp)
     ) {
 
         Text(
