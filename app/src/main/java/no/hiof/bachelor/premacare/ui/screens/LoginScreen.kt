@@ -3,6 +3,10 @@ package no.hiof.bachelor.premacare.ui.screens
 
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.background
@@ -33,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +48,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -59,127 +65,128 @@ import androidx.compose.ui.unit.sp
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 import no.hiof.bachelor.premacare.R
-
+import no.hiof.bachelor.premacare.R.drawable.water
 
 @Composable
-fun LoginScreen(takeMeDash: () -> Unit, aboutUs: () -> Unit, auth: FirebaseAuth, newUser: () -> Unit, reset: () -> Unit) {
+fun LoginScreen(
+    takeMeDash: () -> Unit,
+    aboutUs: () -> Unit,
+    auth: FirebaseAuth,
+    newUser: () -> Unit,
+    reset: () -> Unit
+) {
     val firebaseViewModel: FirebaseViewModel = viewModel()
     var showPassword by remember { mutableStateOf(false) }
-    val passwordVisualTransformation = remember { PasswordVisualTransformation() }
 
-    val gradient = Brush.linearGradient(
-        colors = listOf(
-            //0xFFA040C0  livlig lilla
-            //0xFF50D4F2  cyan/blå
-            // 0xFFE8F5E9 lys grønnaktig farge
+    Box(modifier = Modifier.fillMaxSize()) {
 
-
-            Color( 0xFF50D4F2),  // cyan
-            Color.White
-        )
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(brush = gradient)
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top,
+        Image(
+            painter = painterResource(water),
+            contentDescription = "Top background",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+                .fillMaxWidth()
+                .height(280.dp)
+                .align(Alignment.TopCenter)
+        )
 
+        // White box starting from bottom and going up
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(700.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = Color.White,
+                    shape = RoundedCornerShape(topStart = 52.dp, topEnd = 52.dp)
+                )
         ) {
-
-            DrawImg(
-                painter = painterResource(R.drawable.premacare),
-                contentDescription = "Logo",
+            Column(
                 modifier = Modifier
-                    .padding(top = 10.dp)
-                    .fillMaxWidth()
-            )
-
-            SpaceEm(10.dp)
-            // Not sure about this one ....
-            Text(
-                text = "Logg inn",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            SpaceEm(10.dp)
-
-            // ----------Login------------------------
-            OutlinedTextField(
-                value = firebaseViewModel.email.value,
-                onValueChange = { newValue -> firebaseViewModel.email.value = newValue },
-                label = { Text("E-Post") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color(0x80FFFFFF),
-                    unfocusedContainerColor = Color.White,
-
-                ),
-                modifier = Modifier.fillMaxWidth()
-
-            )
-
-            SpaceEm(10.dp)
-
-            var showPassword by remember { mutableStateOf(false) }
-
-            OutlinedTextField(
-                value = firebaseViewModel.password.value,
-                onValueChange = { newValue -> firebaseViewModel.password.value = newValue },
-                label = { Text("Passord") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = Color(0x80FFFFFF),
-                    unfocusedContainerColor = Color.White
-                ),
-                visualTransformation = if (showPassword) {
-                    VisualTransformation.None
-                } else {
-                    PasswordVisualTransformation()
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth(),  // This is fine now
-                trailingIcon = {
-                    IconButton(onClick = { showPassword = !showPassword }) {
-                        Icon(
-                            imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = "Toggle password visibility"
-                        )
-                    }
-                }
-            )
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
 
-            SpaceEm(15.dp)
+                DrawImg(
+                    painter = painterResource(R.drawable.premacare),
+                    contentDescription = "Logo",
+                    modifier = Modifier,
+                    size = 150
+                )
 
-            ButtonWithToast(
-                firebaseViewModel,
-                { takeMeDash() },
-                "Logg inn",
-                auth = auth,
-                "Obs, Noe gikk galt. Vennligst prøv igjen."
-            )
+                Spacer(modifier = Modifier.height(8.dp))
 
-            SpaceEm(10.dp)
+                Text(
+                    text = "Logg inn",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
 
+                Spacer(modifier = Modifier.height(16.dp))
 
-            AuthFooter(
-               newUser, reset
-            )
+                OutlinedTextField(
+                    value = firebaseViewModel.email.value,
+                    onValueChange = { firebaseViewModel.email.value = it },
+                    label = { Text("E-post") },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0x80FFFFFF),
+                        unfocusedContainerColor = Color.White,
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            AboutUsText(aboutUs,"  V1 Om Oss" )
+                Spacer(modifier = Modifier.height(10.dp))
 
+                OutlinedTextField(
+                    value = firebaseViewModel.password.value,
+                    onValueChange = { firebaseViewModel.password.value = it },
+                    label = { Text("Passord") },
+                    shape = RoundedCornerShape(10.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color(0x80FFFFFF),
+                        unfocusedContainerColor = Color.White
+                    ),
+                    visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { showPassword = !showPassword }) {
+                            Icon(
+                                imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                contentDescription = "Toggle password visibility"
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
 
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ButtonWithToast(
+                    firebaseViewModel = firebaseViewModel,
+                    takeMeDash = takeMeDash,
+                    buttonText = "Logg inn",
+                    auth = auth,
+                    toastMessage = "Obs, noe gikk galt. Vennligst prøv igjen."
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AuthFooter(newUser = newUser, reset = reset)
+
+                AboutUsText(aboutUs = aboutUs, text = "  V1 Om Oss")
+            }
         }
     }
 }
+
+
+
 
 @Composable
 fun AuthFooter(newUser: () -> Unit, reset: () -> Unit) {
@@ -223,7 +230,7 @@ fun AboutUsText(aboutUs: () -> Unit, text: String) {
     Text(
         text = text,
         color = Color.Gray,
-        fontSize = 12.sp,
+        fontSize = 13.sp,
         textDecoration = TextDecoration.Underline,
         modifier =
         Modifier
@@ -302,12 +309,12 @@ fun ButtonWithToast(
 
 
 @Composable
-fun DrawImg(painter: Painter, contentDescription: String, modifier: Modifier = Modifier) {
+fun DrawImg(painter: Painter, contentDescription: String, modifier: Modifier = Modifier, size: Int) {
     Image(
         painter = painter,
         contentDescription = contentDescription,
         modifier = modifier
-            .size(380.dp)
+            .size(size.dp)
     )
 }
 

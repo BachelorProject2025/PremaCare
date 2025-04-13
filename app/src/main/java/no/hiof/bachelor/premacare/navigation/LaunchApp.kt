@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -96,11 +97,10 @@ fun LaunchApp(auth: FirebaseAuth) {
                 else -> "Prema Care"
             }*/
 
-// Apply the gradient as a background to a Box, Column, or any suitable composable
-// that fills the top bar area.
             Column(
+                //.background(Color(0xFF50D4F2))
                 modifier = Modifier
-                    .background(Color(0xFF50D4F2))
+                    .background(Color(0xFFE6F7FF))
                     .fillMaxWidth()
                     .padding(
                         top = WindowInsets.statusBars
@@ -126,9 +126,8 @@ fun LaunchApp(auth: FirebaseAuth) {
                                     contentDescription = "App Logo",
                                     modifier = Modifier
                                         .height(100.dp)
-                                        .width(200.dp)
-
-
+                                        .width(200.dp),
+                                    colorFilter = ColorFilter.tint(Color(0xFF0077B6))
 
                                 )
                             }
@@ -143,7 +142,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                             Icon(
                                 imageVector = Icons.Outlined.ArrowBack,
                                 contentDescription = "Back",
-                                tint =  Color.Black
+                                tint =  Color(0xFF0077B6)
                             )
                         }
                     },
@@ -156,7 +155,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                                 Icon(
                                     imageVector = Icons.Outlined.Settings,
                                     contentDescription = "User Settings",
-                                    tint =  Color.Black
+                                    tint =  Color(0xFF0077B6)
                                 )
 
 
@@ -179,15 +178,13 @@ fun LaunchApp(auth: FirebaseAuth) {
         }
     }, bottomBar = {
         if (isBottomBarVisible.value) {
-            //0xFFA040C0  livlig lilla
-            //0xFF50D4F2 cyan/blue
-            //0xFFA040C0 livlig lilla
-            // 0xFFE8F5E9 lys grønnaktig farge
-            BottomAppBar(containerColor = Color(0xFF50D4F2)) {
+            //ice blue Color(0xFFE6F7FF)
+            BottomAppBar(containerColor = Color(0xFFE6F7FF)) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(0.dp, 20.dp, 0.dp),
+                        .padding(0.dp, 15.dp, 0.dp)
+                        .height(38.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     for (item in items) {
@@ -203,13 +200,13 @@ fun LaunchApp(auth: FirebaseAuth) {
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
-                                modifier = Modifier.size(30.dp),
-                                tint = if (isSelected) Color.Black else Color.White
+                                modifier = Modifier.size(21.dp),
+                                tint = if (isSelected) Color(0xFF5A6C7B) else Color(0xFF0077B6)
 
                             )
                             Text(
                                 text = item.label,
-                                color = if (isSelected) Color.Black else Color.White
+                                color = if (isSelected) Color(0xFF5A6C7B) else Color(0xFF0077B6)
                                 )
 
                         }

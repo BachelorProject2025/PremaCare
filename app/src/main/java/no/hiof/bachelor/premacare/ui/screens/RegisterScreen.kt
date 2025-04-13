@@ -64,7 +64,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
 
         Text(
             text = "Registrere",
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -106,6 +106,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                     value = firebaseViewModel.parentName.value,
                     onValueChange = { newValue -> firebaseViewModel.parentName.value = newValue },
                     label = { Text("Forelders Navn") },
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -117,6 +118,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                     value = firebaseViewModel.phoneNumer.value,
                     onValueChange = { newValue -> firebaseViewModel.phoneNumer.value = newValue },
                     label = { Text("Telefon Nummer") },
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -155,6 +157,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                     value = firebaseViewModel.childsName.value,
                     onValueChange = { newValue -> firebaseViewModel.childsName.value = newValue },
                     label = { Text("Barnets Navn") },
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -168,6 +171,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                         firebaseViewModel.chilDateOfBirth.value = newValue
                     },
                     label = { Text("Barnet Er Født") },
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -206,6 +210,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                     value = firebaseViewModel.email.value,
                     onValueChange = { newValue -> firebaseViewModel.email.value = newValue },
                     label = { Text("E-post") },
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
@@ -219,6 +224,7 @@ fun RegisterScreen(toLogin: ()-> Unit) {
                     value = firebaseViewModel.password.value,
                     onValueChange = { newValue -> firebaseViewModel.password.value = newValue },
                     label = { Text("Passord") },
+                    shape = RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = Color(0x80FFFFFF),
                         unfocusedContainerColor = Color.White
