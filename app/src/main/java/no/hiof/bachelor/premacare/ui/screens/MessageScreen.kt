@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,14 +24,18 @@ fun MessageScreen() {
     var message by remember { mutableStateOf(TextFieldValue()) }
 
     LaunchedEffect(Unit) {
-        firebaseViewModel.fetchMessages() // Hent meldinger ved oppstart
+        firebaseViewModel.fetchMessagesRealtime() // Hent meldinger ved oppstart
         firebaseViewModel.fetchParentName()
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { msg ->
-                MessageBubble(text = msg.message, senderId = msg.senderid, firebaseViewModel.parentName.value)
+                MessageBubble(
+                    text = msg.message,
+                    senderId = msg.senderid,
+                    parentName = firebaseViewModel.parentName.value
+                )
                 Spacer(modifier = Modifier.height(7.dp))
             }
         }
@@ -80,7 +85,7 @@ fun MessageBubble(text: String, senderId: String, parentName: String?) {
             .padding(12.dp)
     ) {
         Column {
-            // Add sender's name in the top corner
+
             Text(
                 text = if (senderId == "Sykepleier") "Sykepleier" else parentName ?: "Unknown",
                 style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
@@ -94,4 +99,3 @@ fun MessageBubble(text: String, senderId: String, parentName: String?) {
         }
     }
 }
-
