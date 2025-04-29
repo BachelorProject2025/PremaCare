@@ -39,6 +39,8 @@ import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 @Composable
 fun SettingsScreen(
     navigateToChangePassword: () -> Unit,
+    navigateToChangeCoParent: () -> Unit,
+
     home: () -> Unit
 
 ) {
@@ -99,7 +101,7 @@ fun SettingsScreen(
             title = "Legg til med forelder",
             icon = Icons.Default.Group,
             action = {
-                IconButton(onClick = {}) {
+                IconButton(onClick = { navigateToChangeCoParent()}) {
                     Icon(Icons.Default.ArrowForward, contentDescription = "Go")
                 }
             }

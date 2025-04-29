@@ -1,6 +1,7 @@
 package no.hiof.bachelor.premacare.navigation
 
 
+import CoParentScreen
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
@@ -294,7 +295,18 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isTopAppVisible.value = true
                 isFloatingActionButtonVisible.value = false
                 SettingsScreen({navController.navigate(AppScreens.Reset.name)},
+                    {
+                        navController.navigate(AppScreens.CoParent.name)
+                    },
                     home = {navController.navigate(AppScreens.Login.name)})
+            }
+
+            composable(AppScreens.CoParent.name) {
+                isBottomBarVisible.value = true
+                isTopAppVisible.value = true
+                isFloatingActionButtonVisible.value = true
+                CoParentScreen(auth.currentUser?.uid.toString(),
+                    {navController.navigate(AppScreens.DashBoard.name)})
             }
 
         }

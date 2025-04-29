@@ -9,5 +9,6 @@ enum class AppScreens {
     NewEntry,
     Reset,
     Message,
-    Settings
+    Settings,
+    CoParent
 }
