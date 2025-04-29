@@ -12,7 +12,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
@@ -28,7 +30,17 @@ fun MessageScreen() {
         firebaseViewModel.fetchParentName()
     }
 
+
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(
+            text = "Samtale med sykepleier",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
+        SpaceEm(10.dp)
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(messages) { msg ->
                 MessageBubble(
