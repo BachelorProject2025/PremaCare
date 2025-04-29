@@ -2,6 +2,7 @@ package no.hiof.bachelor.premacare.ui.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -51,7 +52,12 @@ import no.hiof.bachelor.premacare.model.WebsiteItem
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import no.hiof.bachelor.premacare.model.FeedingRecord
+import no.hiof.bachelor.premacare.model.Message
+import no.hiof.bachelor.premacare.viewModels.getEffectiveUserIdSuspend
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -66,20 +72,31 @@ fun DashBoardScreen() {
     val currentIntake by firebaseViewModel.currentIntake.observeAsState(0.0f) // Default value
     val currentWeight by firebaseViewModel.lastWeight.observeAsState(0.0f)
 
+
+
     // Kall funksjonen for å hente totalt inntak for i dag når composable-en først blir lastet
 
+    //LaunchedEffect(Unit) {
+    //    firebaseViewModel.getTotalAmountForToday()
+    //    firebaseViewModel.getLastWeight()
+    //    firebaseViewModel.fetchChildsName()
+    //    firebaseViewModel.fetchMemberSinceDate()
+    //}
     LaunchedEffect(Unit) {
-        firebaseViewModel.getTotalAmountForToday()
-        firebaseViewModel.getLastWeight()
-    }
+        val effectiveUserId = getEffectiveUserIdSuspend()
+        Log.d("DEBUG", "Effektiv bruker-ID er: $effectiveUserId")
 
-
-
-
-    // igjen en test for å hente barnenavn
-    LaunchedEffect(Unit) {
-        firebaseViewModel.fetchChildsName()
-        firebaseViewModel.fetchMemberSinceDate()
+        // Sjekk om effectiveUserId er korrekt før videre kall
+        if (effectiveUserId != null) {
+                // Hent dataene for Forelder 1 (eller medforelder hvis det er aktuelt)
+                firebaseViewModel.getTotalAmountForToday()
+                firebaseViewModel.getLastWeight()
+                firebaseViewModel.fetchChildsName()
+                firebaseViewModel.fetchMemberSinceDate()
+            Log.d("DEBUG", "Data hentet for bruker-ID: $effectiveUserId")
+        } else {
+            Log.e("ERROR", "Ingen gyldig effektiv bruker-ID funnet!")
+        }
     }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally,

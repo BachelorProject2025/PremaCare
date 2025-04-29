@@ -1,24 +1,36 @@
 package no.hiof.bachelor.premacare.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.withContext
 import no.hiof.bachelor.premacare.model.FeedingRecord
 import no.hiof.bachelor.premacare.model.Message
+import no.hiof.bachelor.premacare.model.User
+import no.hiof.bachelor.premacare.model.toMap
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 
 class FirebaseViewModel : ViewModel() {
@@ -74,10 +86,8 @@ class FirebaseViewModel : ViewModel() {
     val weight = _weight
 
     // -------- Message --------
-   // private val _messages = MutableLiveData<List<Message>>()
-   // val messages: LiveData<List<Message>> = _messages
-
-
+    // private val _messages = MutableLiveData<List<Message>>()
+    // val messages: LiveData<List<Message>> = _messages
 
 
     fun registerUser(onResult: (Boolean) -> Unit) {
@@ -92,7 +102,8 @@ class FirebaseViewModel : ViewModel() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     // Opprett bruker i Firebase Authentication
-                    val authResult = auth.createUserWithEmailAndPassword(emailValue, passwordValue).await()
+                    val authResult =
+                        auth.createUserWithEmailAndPassword(emailValue, passwordValue).await()
                     val currentUser = authResult.user
 
                     if (currentUser != null) {
@@ -126,7 +137,7 @@ class FirebaseViewModel : ViewModel() {
     }
 
 
-    // Fetch the username from Firestore
+    //Fetch the username from Firestore
     fun fetchChildsName() {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
@@ -141,7 +152,6 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
-
 
 
     // Fetch the user's member since date
@@ -197,6 +207,7 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+
     fun logOut() {
         auth.signOut()
     }
@@ -215,7 +226,14 @@ class FirebaseViewModel : ViewModel() {
 
     //------------------ Feeding records ----------------------
 
-    fun saveFeedingRecord(amount: Int,weight: Int, pee: Boolean, poo: Boolean, feedingMethod: String, comment: String) {
+    fun saveFeedingRecord(
+        amount: Int,
+        weight: Int,
+        pee: Boolean,
+        poo: Boolean,
+        feedingMethod: String,
+        comment: String
+    ) {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
             val userId = user.uid
@@ -223,7 +241,10 @@ class FirebaseViewModel : ViewModel() {
                 amount = amount,
                 weight = weight,
                 time = Timestamp.now(), // Bruker Firestore sin Timestamp
-                date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()), // Dagens dato som String
+                date = SimpleDateFormat(
+                    "yyyy-MM-dd",
+                    Locale.getDefault()
+                ).format(Date()), // Dagens dato som String
                 pee = pee,
                 poo = poo,
                 feedingMethod = feedingMethod,
@@ -251,7 +272,10 @@ class FirebaseViewModel : ViewModel() {
         val currentUser = auth.currentUser
         currentUser?.let { user ->
             val userId = user.uid
-            val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) // Henter dagens dato
+            val todayDate = SimpleDateFormat(
+                "yyyy-MM-dd",
+                Locale.getDefault()
+            ).format(Date()) // Henter dagens dato
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -262,7 +286,8 @@ class FirebaseViewModel : ViewModel() {
                         .get()
                         .await()
 
-                    val totalAmount = snapshot.documents.sumOf { it.getLong("amount")?.toInt() ?: 0 }
+                    val totalAmount =
+                        snapshot.documents.sumOf { it.getLong("amount")?.toInt() ?: 0 }
                     _currentIntake.postValue(totalAmount.toFloat())
 
                 } catch (e: Exception) {
@@ -285,7 +310,10 @@ class FirebaseViewModel : ViewModel() {
                     val snapshot = firestore.collection("users")
                         .document(userId)
                         .collection("feedingRecords")
-                        .orderBy("time", Query.Direction.DESCENDING) // Match field name in Firestore
+                        .orderBy(
+                            "time",
+                            Query.Direction.DESCENDING
+                        ) // Match field name in Firestore
                         .limit(1)
                         .get()
                         .await()
@@ -304,27 +332,26 @@ class FirebaseViewModel : ViewModel() {
     //------------------ Message ----------------------
 
 
+    //fun fetchMessages() {
+    //    val userId = auth.currentUser?.uid ?: return
+    //    CoroutineScope(Dispatchers.IO).launch {
+    //        try {
+    //            val messageList = firestore.collection("users")
+    //                .document(userId)
+    //                .collection("messages")
+    //                .orderBy("timestamp")
+    //                .get()
+    //                .await()
+    //                .toObjects(Message::class.java)
 
-   //fun fetchMessages() {
-   //    val userId = auth.currentUser?.uid ?: return
-   //    CoroutineScope(Dispatchers.IO).launch {
-   //        try {
-   //            val messageList = firestore.collection("users")
-   //                .document(userId)
-   //                .collection("messages")
-   //                .orderBy("timestamp")
-   //                .get()
-   //                .await()
-   //                .toObjects(Message::class.java)
-
-   //            withContext(Dispatchers.Main) {
-   //                _messages.value = messageList
-   //            }
-   //        } catch (e: Exception) {
-   //            println("Error fetching messages: ${e.message}")
-   //        }
-   //    }
-   //}
+    //            withContext(Dispatchers.Main) {
+    //                _messages.value = messageList
+    //            }
+    //        } catch (e: Exception) {
+    //            println("Error fetching messages: ${e.message}")
+    //        }
+    //    }
+    //}
 
     private val _messages = MutableLiveData<List<Message>>()
     val messages: LiveData<List<Message>> get() = _messages
@@ -371,7 +398,119 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
+
+    // legge til en medforelder
+    fun registerCoParentWithRelogin(
+        coEmail: String,
+        coPassword: String,
+        parent1Password: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
+        val parent1Uid = auth.currentUser?.uid
+        val parent1Email = auth.currentUser?.email
+
+        if (parent1Uid == null || parent1Email == null) {
+            onFailure(Exception("Forelder 1 er ikke logget inn"))
+            return
+        }
+
+        // Steg 1: Opprett medforelder
+        auth.createUserWithEmailAndPassword(coEmail, coPassword)
+            .addOnSuccessListener { result ->
+                val coParentUid = result.user?.uid
+                if (coParentUid == null) {
+                    onFailure(Exception("Kunne ikke hente medforelder UID"))
+                    return@addOnSuccessListener
+                }
+
+                // Steg 2: Opprett dokument for medforelder med coParentOf
+                val coParentData = mapOf("coParentOf" to parent1Uid)
+                db.collection("users").document(coParentUid).set(coParentData)
+                    .addOnSuccessListener {
+                        // Steg 3: Logg inn igjen som forelder 1
+                        auth.signInWithEmailAndPassword(parent1Email, parent1Password)
+                            .addOnSuccessListener {
+                                // Steg 4: Oppdater forelder 1 sitt dokument
+                                db.collection("users").document(parent1Uid)
+                                    .update("coParents", FieldValue.arrayUnion(coParentUid))
+                                    .addOnSuccessListener { onSuccess() }
+                                    .addOnFailureListener { onFailure(it) }
+                            }
+                            .addOnFailureListener { onFailure(it) }
+                    }
+                    .addOnFailureListener { onFailure(it) }
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
 }
+
+// For å komme til ritkig profil som medforelder må vi bruke den andres uid
+//suspend fun getEffectiveUserIdSuspend(): String? {
+//    val auth = FirebaseAuth.getInstance()
+//    val db = FirebaseFirestore.getInstance()
+//    val currentUser = auth.currentUser
+//
+//    return if (currentUser != null) {
+//        try {
+//            val document = db.collection("users").document(currentUser.uid).get().await()
+//            if (document.exists()) {
+//                val coParentOf = document.getString("coParentOf")
+//                if (coParentOf != null) {
+//                    return coParentOf // Returnerer medforelderens UID
+//                } else {
+//                    return currentUser.uid // Returnerer Forelder 1
+//                }
+//            } else {
+//                null // Ingen brukerdata finnes
+//            }
+//        } catch (e: Exception) {
+//            Log.e("ERROR", "Feil ved henting av effektiv bruker-ID", e)
+//            return null
+//        }
+//    } else {
+//        null // Ingen bruker er logget inn
+//    }
+//}
+suspend fun getEffectiveUserIdSuspend(): String? {
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    val currentUser = auth.currentUser
+
+    return if (currentUser != null) {
+        try {
+            // Hent medforelderens dokument
+            val document = db.collection("users").document(currentUser.uid).get().await()
+
+            if (document.exists()) {
+                // Sjekk om medforelderen har en coParentOf-verdi
+                val coParentOf = document.getString("coParentOf")
+                if (coParentOf != null) {
+                    // Hent Forelder 1 sin UID fra coParentOf og returner den
+                    return coParentOf
+                } else {
+                    // Hvis coParentOf ikke er satt, returner medforelderens egen UID
+                    return currentUser.uid
+                }
+            } else {
+                Log.e("ERROR", "Brukerdokumentet finnes ikke.")
+                return null
+            }
+        } catch (e: Exception) {
+            Log.e("ERROR", "Feil ved henting av effektiv bruker-ID", e)
+            return null
+        }
+    } else {
+        Log.e("ERROR", "Ingen bruker er logget inn.")
+        return null
+    }
+}
+
+
+
+
 
 
 
