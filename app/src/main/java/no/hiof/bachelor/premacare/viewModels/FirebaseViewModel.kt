@@ -357,25 +357,43 @@ class FirebaseViewModel : ViewModel() {
     val messages: LiveData<List<Message>> get() = _messages
 
     // Funksjon for å hente meldinger
-    fun fetchMessages() {
-        val userId = auth.currentUser?.uid ?: return
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val messageList = firestore.collection("users")
-                    .document(userId)
-                    .collection("messages")
-                    .orderBy("timestamp")
-                    .get()
-                    .await()
-                    .toObjects(Message::class.java)
+   //fun fetchMessages() {
+   //    val userId = auth.currentUser?.uid ?: return
+   //    CoroutineScope(Dispatchers.IO).launch {
+   //        try {
+   //            val messageList = firestore.collection("users")
+   //                .document(userId)
+   //                .collection("messages")
+   //                .orderBy("timestamp")
+   //                .get()
+   //                .await()
+   //                .toObjects(Message::class.java)
 
-                withContext(Dispatchers.Main) {
-                    // Updating LiveData
-                    _messages.value = messageList
-                }
-            } catch (e: Exception) {
-                println("Error fetching messages: ${e.message}")
+   //            withContext(Dispatchers.Main) {
+   //                // Updating LiveData
+   //                _messages.value = messageList
+   //            }
+   //        } catch (e: Exception) {
+   //            println("Error fetching messages: ${e.message}")
+   //        }
+   //    }
+   //}
+
+    fun fetchMessagesRealtime() {
+        val userId = auth.currentUser?.uid ?: return
+        val messagesRef = firestore.collection("users")
+            .document(userId)
+            .collection("messages")
+            .orderBy("timestamp")
+
+        messagesRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                println("Error fetching messages: ${error.message}")
+                return@addSnapshotListener
             }
+
+            val messageList = snapshot?.toObjects(Message::class.java) ?: emptyList()
+            _messages.value = messageList
         }
     }
 
@@ -392,7 +410,7 @@ class FirebaseViewModel : ViewModel() {
                     .set(message)
                     .await()
 
-                fetchMessages() // Oppdater listen etter sending
+                fetchMessagesRealtime() // Oppdater listen etter sending
             } catch (e: Exception) {
                 println("Error sending message: ${e.message}")
             }
