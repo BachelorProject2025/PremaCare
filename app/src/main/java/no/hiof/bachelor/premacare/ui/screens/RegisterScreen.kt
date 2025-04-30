@@ -45,9 +45,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -126,17 +129,22 @@ fun RegisterScreen(toLogin: () -> Unit) {
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    OutlinedTextField(
-                        value = firebaseViewModel.phoneNumer.value,
-                        onValueChange = { firebaseViewModel.phoneNumer.value = it },
-                        label = { Text("Telefon Nummer") },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color(0x80FFFFFF),
-                            unfocusedContainerColor = Color.White
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                   // OutlinedTextField(
+                   //     value = firebaseViewModel.phoneNumer.value,
+                   //     onValueChange = { firebaseViewModel.phoneNumer.value = it },
+                   //     label = { Text("Telefon Nummer") },
+                   //     shape = RoundedCornerShape(16.dp),
+                   //     colors = OutlinedTextFieldDefaults.colors(
+                   //         focusedContainerColor = Color(0x80FFFFFF),
+                   //         unfocusedContainerColor = Color.White
+                   //     ),
+                   //     modifier = Modifier.fillMaxWidth()
+                   // )
+
+                    //val rawPhoneNumber = firebaseViewModel.phoneNumer.value.replace(" ", "")
+                     PhoneNumberField(firebaseViewModel)
                 }
             }
         }
@@ -171,6 +179,7 @@ fun RegisterScreen(toLogin: () -> Unit) {
                         ),
                         modifier = Modifier.fillMaxWidth()
                     )
+                    Spacer(modifier = Modifier.height(10.dp))  
 
                    //OutlinedTextField(
                    //    value = firebaseViewModel.chilDateOfBirth.value,
@@ -356,6 +365,65 @@ fun DateOfBirthPicker(firebaseViewModel: FirebaseViewModel) {
         }
     }
 }
+
+@Composable
+fun PhoneNumberField(firebaseViewModel: FirebaseViewModel) {
+    val rawNumber = firebaseViewModel.phoneNumer.value.filter { it.isDigit() }.take(8)
+
+    OutlinedTextField(
+        value = rawNumber,
+        onValueChange = { input ->
+            val digits = input.filter { it.isDigit() }.take(8)
+            firebaseViewModel.phoneNumer.value = digits
+        },
+        label = { Text("Telefon Nummer") },
+        shape = RoundedCornerShape(16.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = Color(0x80FFFFFF),
+            unfocusedContainerColor = Color.White
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth(),
+        visualTransformation = PhoneNumberTransformation()
+    )
+}
+
+class PhoneNumberTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        val trimmed = text.text.take(8).filter { it.isDigit() }
+        val formatted = buildString {
+            for (i in trimmed.indices) {
+                append(trimmed[i])
+                if (i == 2 || i == 4) append(' ')
+            }
+        }
+
+        // OffsetMapping som fikser skriverposisjonen (caret) når mellomrom legges til
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                return when {
+                    offset <= 3 -> offset
+                    offset <= 5 -> offset + 1
+                    offset <= 8 -> offset + 2
+                    else -> formatted.length
+                }
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                return when {
+                    offset <= 3 -> offset
+                    offset <= 6 -> offset - 1
+                    offset <= 9 -> offset - 2
+                    else -> text.text.length
+                }
+            }
+        }
+
+        return TransformedText(AnnotatedString(formatted), offsetMapping)
+    }
+}
+
+
 
 
 

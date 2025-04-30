@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,16 +21,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -240,15 +248,79 @@ fun WebsiteCard(item: WebsiteItem, image: Painter) {
     }
 }
 
+//@Composable
+//fun WebsiteList(websites: List<WebsiteItem>) {
+//    LazyRow(modifier = Modifier.fillMaxWidth()) {
+//        items(websites) { website ->
+//            val image = painterResource(website.imageResId)
+//            WebsiteCard(website, image)
+//        }
+//    }
+//}
+
+//WebsireList med ikoner : venstre og høre scoll mot hørte aktiverer venstre ikon
 @Composable
 fun WebsiteList(websites: List<WebsiteItem>) {
-    LazyRow(modifier = Modifier.fillMaxWidth()) {
-        items(websites) { website ->
-            val image = painterResource(website.imageResId)
-            WebsiteCard(website, image)
+    val listState = rememberLazyListState()
+
+    // Derived states for showing scroll indicators
+    val showLeftArrow by remember {
+        derivedStateOf { listState.firstVisibleItemIndex > 0 }
+    }
+    val showRightArrow by remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisible != null && lastVisible.index < websites.lastIndex
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            state = listState
+        ) {
+            items(websites) { website ->
+                val image = painterResource(website.imageResId)
+                WebsiteCard(website, image)
+            }
+        }
+
+        // Left scroll indicator
+        if (showLeftArrow) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Scroll left",
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 8.dp)
+                    .background(
+                        color = Color.White.copy(alpha = 0.7f),
+                        shape = CircleShape
+                    )
+                    .padding(4.dp),
+                tint = Color.Gray
+            )
+        }
+
+        // Right scroll indicator
+        if (showRightArrow) {
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Scroll right",
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 8.dp)
+                    .background(
+                        color = Color.White.copy(alpha = 0.7f),
+                        shape = CircleShape
+                    )
+                    .padding(4.dp),
+                tint = Color.Gray
+            )
         }
     }
 }
+
 
 //Nyttige lenger :
 // Oppretter website klasser.
