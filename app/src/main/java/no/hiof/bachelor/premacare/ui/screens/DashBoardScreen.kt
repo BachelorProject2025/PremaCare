@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,8 +52,15 @@ import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.model.WebsiteItem
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.zIndex
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import no.hiof.bachelor.premacare.model.FeedingRecord
@@ -327,15 +335,104 @@ val websites = listOf(
     )
 
 // Milk total basert på barnets vekt, 15% av vekt er bra ->  grønn, 12% er ok -> gul under 12% er -> rød
+//dashboard card uten konfetti
+//@Composable
+//fun DashboardCard(
+//    currentIntake: Float,
+//    weight : Float,
+//    modifier: Modifier = Modifier,
+//
+//) {
+//    val context = LocalContext.current
+//
+//
+//    val min = if (weight > 0) 0.12f * weight else 0f
+//    val max = if (weight > 0) 0.15f * weight else 1f
+//
+//    // Kalkulasjon progress basert på currentIntake og max value
+//    val progress = (currentIntake / max).coerceIn(0f, 1f)
+//    val progressColor = if (currentIntake >= min) Color.Green else Color.Red
+//    val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
+//
+//    // Oppdatert animasjons progress når currentIntake forandres
+//    LaunchedEffect(currentIntake) {
+//        animatedProgress.animateTo(progress, animationSpec = tween(durationMillis = 1000))
+//    }
+//
+//    // Sjekk dato og tilbakestill currentIntake ved midnatt
+//    val currentDate = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date()) }
+//    var lastResetDate by remember { mutableStateOf(currentDate) }
+//
+//    // Hvis datoen har endret seg, tilbakestill currentIntake til 0
+//    if (currentDate != lastResetDate) {
+//        // Dette betyr at det er en ny dag
+//        LaunchedEffect(currentDate) {
+//            // Tilbakestill når ny dag begynner
+//
+//            // For nå bare tilbakestiller vi currentIntake
+//
+//            // currentIntake = 0
+//            lastResetDate = currentDate // Oppdater datoen
+//        }
+//    }
+//
+//    Card(
+//        modifier = Modifier
+//            .width(200.dp)
+//            .height(200.dp)
+//            .padding(8.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.White),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Canvas(
+//                modifier = Modifier.size(140.dp)
+//            ) {
+//                val strokeWidth = 16f
+//
+//                drawArc(
+//                    color = Color.LightGray,
+//                    startAngle = -90f,
+//                    sweepAngle = 360f,
+//                    useCenter = false,
+//                    style = Stroke(width = strokeWidth)
+//                )
+//
+//                drawArc(
+//                    color = progressColor,
+//                    startAngle = -90f,
+//                    sweepAngle = 360f * animatedProgress.value,
+//                    useCenter = false,
+//                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+//                )
+//            }
+//
+//            Text(
+//                text = "${currentIntake} ml",
+//                style = MaterialTheme.typography.bodyLarge.copy(
+//                    fontWeight = FontWeight.Bold
+//                ),
+//                color = Color.Black,
+//                fontSize = 27.sp
+//            )
+//        }
+//    }
+//}
+
+//dashboard card med konfetti
+// Når barnet hyar spist 15 % av sin kropsvekt innen 24 timer altså full sirkel vil det komme en konfetti animasjon over progress bar
 @Composable
 fun DashboardCard(
     currentIntake: Float,
-    weight : Float,
+    weight: Float,
     modifier: Modifier = Modifier,
-
 ) {
     val context = LocalContext.current
-
 
     val min = if (weight > 0) 0.12f * weight else 0f
     val max = if (weight > 0) 0.15f * weight else 1f
@@ -344,6 +441,16 @@ fun DashboardCard(
     val progress = (currentIntake / max).coerceIn(0f, 1f)
     val progressColor = if (currentIntake >= min) Color.Green else Color.Red
     val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
+
+    // Confetti-animasjon
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("confetti.json"))
+    val animationProgress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1
+    )
+
+    var lastIntake by remember { mutableStateOf(currentIntake) }
+    var confettiPlayedDate by rememberSaveable { mutableStateOf("") }
 
     // Oppdatert animasjons progress når currentIntake forandres
     LaunchedEffect(currentIntake) {
@@ -359,16 +466,28 @@ fun DashboardCard(
         // Dette betyr at det er en ny dag
         LaunchedEffect(currentDate) {
             // Tilbakestill når ny dag begynner
-            // Denne koden kan tilbakestille Firebase, eller annen logikk du måtte ha
+            // Denne koden kan tilbakestille Firebase
             // For nå bare tilbakestiller vi currentIntake
-            // (Sett opp Firebase eller annen tilbakestilling her om nødvendig)
-            // currentIntake = 0 // For demo formål
+            // currentIntake = 0
             lastResetDate = currentDate // Oppdater datoen
+            confettiPlayedDate = ""     // Reset confetti for ny dag
         }
     }
 
+    // Vis confetti én gang når maks nås
+    LaunchedEffect(currentIntake) {
+        if (
+            lastIntake < max && currentIntake >= max &&
+            confettiPlayedDate != currentDate
+        ) {
+            confettiPlayedDate = currentDate
+            delay(3000)
+        }
+        lastIntake = currentIntake
+    }
+
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(200.dp)
             .height(200.dp)
             .padding(8.dp),
@@ -411,18 +530,107 @@ fun DashboardCard(
                 color = Color.Black,
                 fontSize = 27.sp
             )
+
+            // Confetti lagt som øverste lag
+            if (currentIntake >= max) {
+                LottieAnimation(
+                    composition = composition,
+                    progress = { animationProgress },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(1f)
+                )
+            }
         }
     }
 }
 
+
+
+//Vekt card uten animasjon
+//@Composable
+//fun WeightCard(
+//    currentIntake: Float,
+//    weight: Float,
+//    modifier: Modifier = Modifier
+//) {
+//    Card(
+//        modifier = Modifier
+//            .width(200.dp)
+//            .height(200.dp)
+//            .padding(8.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.White),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+//    ) {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//
+//            Column {
+//                Text(
+//                    text = "Barnets Vekt",
+//                    style = MaterialTheme.typography.bodyLarge.copy(
+//                        fontWeight = FontWeight.Bold
+//                    ),
+//                    color = Color.Black,
+//                    fontSize = 19.sp
+//                )
+//                SpaceEm(15.dp)
+//
+//                Text(
+//                    text = "$weight G",
+//                    style = MaterialTheme.typography.bodyLarge.copy(
+//                        fontWeight = FontWeight.Bold
+//                    ),
+//                    color = Color.Black,
+//                    fontSize = 27.sp
+//                )
+//            }
+//
+//
+//        }
+//    }
+//}
+
+//Vekt card med animasjon
+// når barnet er +1000g av siste vakt altså lagt på sef 1 kg vil det komme en pil opp animasjon
 @Composable
 fun WeightCard(
     currentIntake: Float,
     weight: Float,
     modifier: Modifier = Modifier
 ) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("arrowUp.json"))
+    val animationProgress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1
+    )
+
+    var showArrow by rememberSaveable { mutableStateOf(false) }
+    var lastShownWeight by rememberSaveable { mutableStateOf(weight) }
+    var hasInitialized by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(weight) {
+        // Første gang ignorer vi
+        if (!hasInitialized) {
+            hasInitialized = true
+            lastShownWeight = weight
+            return@LaunchedEffect
+        }
+
+        if ((weight - lastShownWeight) >= 1000f) {
+            showArrow = true
+            lastShownWeight = weight
+            delay(3000)
+            showArrow = false
+        } else if (weight != lastShownWeight) {
+            lastShownWeight = weight
+        }
+    }
+
     Card(
-        modifier = Modifier
+        modifier = modifier
             .width(200.dp)
             .height(200.dp)
             .padding(8.dp),
@@ -430,35 +638,43 @@ fun WeightCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Barnets Vekt",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     color = Color.Black,
                     fontSize = 19.sp
                 )
-                SpaceEm(15.dp)
+
+                Spacer(modifier = Modifier.height(15.dp))
 
                 Text(
                     text = "$weight G",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold
-                    ),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     color = Color.Black,
                     fontSize = 27.sp
                 )
             }
 
-
+            if (showArrow) {
+                LottieAnimation(
+                    composition = composition,
+                    progress = { animationProgress },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(1f)
+                )
+            }
         }
     }
 }
+
+
 
 
 
