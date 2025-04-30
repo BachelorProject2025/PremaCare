@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -83,93 +85,91 @@ import java.util.Locale
 fun DashBoardScreen() {
     val firebaseViewModel: FirebaseViewModel = viewModel()
 
-
-
     val currentIntake by firebaseViewModel.currentIntake.observeAsState(0.0f) // Default value
     val currentWeight by firebaseViewModel.lastWeight.observeAsState(0.0f)
 
-
-
-    // Kall funksjonen for å hente totalt inntak for i dag når composable-en først blir lastet
-
-    //LaunchedEffect(Unit) {
-    //    firebaseViewModel.getTotalAmountForToday()
-    //    firebaseViewModel.getLastWeight()
-    //    firebaseViewModel.fetchChildsName()
-    //    firebaseViewModel.fetchMemberSinceDate()
-    //}
     LaunchedEffect(Unit) {
         val effectiveUserId = getEffectiveUserIdSuspend()
         Log.d("DEBUG", "Effektiv bruker-ID er: $effectiveUserId")
 
         // Sjekk om effectiveUserId er korrekt før videre kall
         if (effectiveUserId != null) {
-                // Hent dataene for Forelder 1 (eller medforelder hvis det er aktuelt)
-                firebaseViewModel.getTotalAmountForToday()
-                firebaseViewModel.getLastWeight()
-                firebaseViewModel.fetchChildsName()
-                firebaseViewModel.fetchMemberSinceDate()
+            firebaseViewModel.getTotalAmountForToday()
+            firebaseViewModel.getLastWeight()
+            firebaseViewModel.fetchChildsName()
+            firebaseViewModel.fetchMemberSinceDate()
             Log.d("DEBUG", "Data hentet for bruker-ID: $effectiveUserId")
         } else {
             Log.e("ERROR", "Ingen gyldig effektiv bruker-ID funnet!")
         }
     }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-
-
-        SpaceEm(10.dp)
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
-
-            Text(
-                fontSize = 18.sp, text = "Forelder/Foresatt av:"
-            )
-            //bare for å teste å hente ut barns navn
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        contentPadding = PaddingValues(16.dp) // Optional, for spacing around the content
+    ) {
+        item {
             SpaceEm(10.dp)
+        }
 
-            Text(
-                color = Color.Black,
-                text = firebaseViewModel.childsName.value,
-                fontSize = 27.sp
-            )
+        item {
+            Column(horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center) {
+                Text(fontSize = 18.sp, text = "Forelder/Foresatt av:")
 
+                //bare for å teste å hente ut barns navn
+                SpaceEm(10.dp)
+
+                Text(
+                    color = Color.Black,
+                    text = firebaseViewModel.childsName.value,
+                    fontSize = 27.sp
+                )
+
+                SpaceEm(20.dp)
+            }
+        }
+
+        item {
+            Row {
+                DashboardCard(
+                    currentIntake = currentIntake,
+                    weight = currentWeight.toFloat()
+                )
+
+                WeightCard(
+                    currentIntake = currentIntake,
+                    weight = currentWeight.toFloat()
+                )
+            }
+        }
+
+        item {
             SpaceEm(20.dp)
-
+            HorizontalLine()
+            SpaceEm(10.dp)
         }
-        Row {
-            DashboardCard(
-                currentIntake = currentIntake,
-                weight = currentWeight.toFloat()
 
-            )
-
-            WeightCard(
-                currentIntake = currentIntake,
-                weight = currentWeight.toFloat()
-            )
-
+        item {
+            Text(color = Color.Black, text = "Nyttige Lenker", fontSize = 22.sp)
         }
-        SpaceEm(20.dp)
-        HorizontalLine()
-        SpaceEm(10.dp)
 
-        Text(color = Color.Black,
-            text = "Nyttige Lenker",
-            fontSize = 22.sp)
+        item {
+            SpaceEm(10.dp)
+            WebsiteList(websites)
+        }
 
-        SpaceEm(10.dp)
+        item {
+            HorizontalLine()
+        }
 
-        WebsiteList(websites)
-
-        HorizontalLine()
-
-        CallButton()
+        item {
+            CallButton()
+        }
     }
-
 }
+
 
 @Composable
 fun CallButton() {
