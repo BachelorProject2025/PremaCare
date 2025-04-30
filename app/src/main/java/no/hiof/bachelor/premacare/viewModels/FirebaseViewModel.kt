@@ -85,6 +85,8 @@ class FirebaseViewModel : ViewModel() {
     private var _weight = mutableStateOf(0)
     val weight = _weight
 
+
+
     // -------- Message --------
     // private val _messages = MutableLiveData<List<Message>>()
     // val messages: LiveData<List<Message>> = _messages
