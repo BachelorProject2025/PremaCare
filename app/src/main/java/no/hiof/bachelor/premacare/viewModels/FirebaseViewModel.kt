@@ -87,11 +87,61 @@ class FirebaseViewModel : ViewModel() {
 
 
 
+
+
     // -------- Message --------
     // private val _messages = MutableLiveData<List<Message>>()
     // val messages: LiveData<List<Message>> = _messages
 
 
+    // Uten Password validation check
+  // fun registerUser(onResult: (Boolean) -> Unit) {
+  //     val emailValue = email.value
+  //     val passwordValue = password.value
+  //     val parentNameValue = parentName.value
+  //     val phoneNumerValue = phoneNumer.value
+  //     val childsNameValue = childsName.value
+  //     val chilDateOfBirthValue = chilDateOfBirth.value
+
+  //     if (emailValue.isNotBlank() && passwordValue.isNotBlank() && childsNameValue.isNotBlank()) {
+  //         CoroutineScope(Dispatchers.IO).launch {
+  //             try {
+  //                 // Opprett bruker i Firebase Authentication
+  //                 val authResult =
+  //                     auth.createUserWithEmailAndPassword(emailValue, passwordValue).await()
+  //                 val currentUser = authResult.user
+
+  //                 if (currentUser != null) {
+  //                     val userId = currentUser.uid
+  //                     val userMap = hashMapOf(
+  //                         "chilDateOfBirth" to chilDateOfBirthValue,
+  //                         "childsName" to childsNameValue,
+  //                         "parentName" to parentNameValue,
+  //                         "phoneNumer" to phoneNumerValue,
+  //                         "email" to emailValue
+  //                     )
+
+  //                     // Lagre brukerinfo i Firestore
+  //                     firestore.collection("users").document(userId).set(userMap).await()
+
+  //                     // Oppdater UI på hovedtråden
+  //                     withContext(Dispatchers.Main) {
+  //                         fetchChildsName() // Henter barnets navn etter registrering
+  //                         onResult(true) // Registrering vellykket
+  //                     }
+  //                 } else {
+  //                     withContext(Dispatchers.Main) { onResult(false) }
+  //                 }
+  //             } catch (e: Exception) {
+  //                 withContext(Dispatchers.Main) { onResult(false) }
+  //             }
+  //         }
+  //     } else {
+  //         onResult(false) // Feil hvis noen felt er tomme
+  //     }
+  // }
+
+    // Med Password validation check
     fun registerUser(onResult: (Boolean) -> Unit) {
         val emailValue = email.value
         val passwordValue = password.value
@@ -99,6 +149,12 @@ class FirebaseViewModel : ViewModel() {
         val phoneNumerValue = phoneNumer.value
         val childsNameValue = childsName.value
         val chilDateOfBirthValue = chilDateOfBirth.value
+
+        //  Password validation check
+        if (!isValidPassword(passwordValue)) {
+            onResult(false)
+            return
+        }
 
         if (emailValue.isNotBlank() && passwordValue.isNotBlank() && childsNameValue.isNotBlank()) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -137,6 +193,7 @@ class FirebaseViewModel : ViewModel() {
             onResult(false) // Feil hvis noen felt er tomme
         }
     }
+
 
 
     //Fetch the username from Firestore
@@ -223,6 +280,16 @@ class FirebaseViewModel : ViewModel() {
 
     fun isValidRegistration(): Boolean {
         return email.value.isNotBlank() && password.value.isNotBlank()
+    }
+
+    // En ekstra passord sjekk siden firebase kun har "må være 6 characters", vi ønsker noe litt mer
+    //ced å bruk store og små bokstaver, tall og spesialtegn (!, ?, @, # osv.)
+    fun isValidPassword(password: String): Boolean {
+        val hasUppercase = password.any { it.isUpperCase() }
+        val hasLowercase = password.any { it.isLowerCase() }
+        val hasDigit = password.any { it.isDigit() }
+        val hasSpecialChar = password.any { "!@#\$%^&*()_+[]{}|;:',.<>?/`~".contains(it) }
+        return password.length >= 6 && hasUppercase && hasLowercase && hasDigit && hasSpecialChar
     }
 
 
