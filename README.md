@@ -50,7 +50,7 @@ Navigate to the cloned project folder, then open it in Android Studio.
 	4.	Build and run the app:
 Once everything is set up and synced with Firebase, click “Build” in Android Studio to compile the app. Then, run it on either an emulator or a physical device.
 
-Usage 📱
+##Usage 📱
 	•	After logging in, parents can start logging their baby’s health data.
 	•	Feeding details, weight, and bowel movements can be easily tracked using the provided interfaces.
 	•	Co-parents can be added by entering their login credentials.
