@@ -233,26 +233,59 @@ fun RegisterScreen(toLogin: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    OutlinedTextField(
-                        value = firebaseViewModel.password.value,
-                        onValueChange = { firebaseViewModel.password.value = it },
-                        label = { Text("Passord") },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color(0x80FFFFFF),
-                            unfocusedContainerColor = Color.White
-                        ),
-                        visualTransformation = if (showPassword) VisualTransformation.None else passwordVisualTransformation,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        trailingIcon = {
-                            Icon(
-                                if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                contentDescription = "Toggle password visibility",
-                                modifier = Modifier.clickable { showPassword = !showPassword }
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                   // OutlinedTextField(
+                   //     value = firebaseViewModel.password.value,
+                   //     onValueChange = { firebaseViewModel.password.value = it },
+                   //     label = { Text("Passord") },
+                   //     shape = RoundedCornerShape(16.dp),
+                   //     colors = OutlinedTextFieldDefaults.colors(
+                   //         focusedContainerColor = Color(0x80FFFFFF),
+                   //         unfocusedContainerColor = Color.White
+                   //     ),
+                   //     visualTransformation = if (showPassword) VisualTransformation.None else passwordVisualTransformation,
+                   //     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                   //     trailingIcon = {
+                   //         Icon(
+                   //             if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                   //             contentDescription = "Toggle password visibility",
+                   //             modifier = Modifier.clickable { showPassword = !showPassword }
+                   //         )
+                   //     },
+                   //     modifier = Modifier.fillMaxWidth()
+                   // )
+
+                    Column {
+                        val password = firebaseViewModel.password.value
+                        val isValid = firebaseViewModel.isValidPassword(password)
+                        OutlinedTextField(
+                            value = firebaseViewModel.password.value,
+                            onValueChange = { firebaseViewModel.password.value = it },
+                            label = { Text("Passord") },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color(0x80FFFFFF),
+                                unfocusedContainerColor = Color.White
+                            ),
+                            visualTransformation = if (showPassword) VisualTransformation.None else passwordVisualTransformation,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            trailingIcon = {
+                                Icon(
+                                    if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                    contentDescription = "Toggle password visibility",
+                                    modifier = Modifier.clickable { showPassword = !showPassword }
+                                )
+                            },
+                            isError = firebaseViewModel.password.value.isNotEmpty() && !isValid,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        Text(
+                            text = "Bruk store og små bokstaver, tall og spesialtegn (!, ?, @, # osv.)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (password.isNotEmpty() && !isValid) Color.Red else Color.Gray,
+                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                        )
+                    }
                 }
             }
 
