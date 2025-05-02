@@ -1,7 +1,9 @@
 package no.hiof.bachelor.premacare.viewModels
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -85,7 +87,12 @@ class FirebaseViewModel : ViewModel() {
     private var _weight = mutableStateOf(0)
     val weight = _weight
 
+// for logg delen
+    var feedingRecords by mutableStateOf<List<FeedingRecord>>(emptyList())
+        private set
 
+    var isLoading by mutableStateOf(true)
+        private set
 
 
 
@@ -333,6 +340,34 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
+
+    // Henter feedings
+    fun fetchFeedingRecords() {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            isLoading = true
+            val userId = user.uid
+            firestore.collection("users")
+                .document(userId)
+                .collection("feedingRecords")
+                .orderBy("time", Query.Direction.DESCENDING)
+                .addSnapshotListener { snapshot, exception ->
+                    if (exception != null) {
+                        println("Error fetching records: ${exception.message}")
+                        isLoading = false
+                        return@addSnapshotListener
+                    }
+
+                    snapshot?.let {
+                        feedingRecords = it.documents.mapNotNull { doc ->
+                            doc.toObject(FeedingRecord::class.java)
+                        }
+                        isLoading = false
+                    }
+                }
+        }
+    }
+
 
     private val _currentIntake = MutableLiveData<Float>()
     val currentIntake: LiveData<Float> = _currentIntake
