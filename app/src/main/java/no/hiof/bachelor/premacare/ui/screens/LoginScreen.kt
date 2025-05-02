@@ -179,7 +179,7 @@ fun LoginScreen(
 
                 AuthFooter(newUser = newUser, reset = reset)
 
-                AboutUsText(aboutUs = aboutUs, text = "  V1 Om Oss")
+                AboutUsText(aboutUs = aboutUs, text = "  V1 Kontakt Oss")
             }
         }
     }

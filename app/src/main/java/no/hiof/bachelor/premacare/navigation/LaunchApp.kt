@@ -61,7 +61,7 @@ import com.google.firebase.auth.FirebaseUser
 import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.ui.screens.AboutUs
 import no.hiof.bachelor.premacare.ui.screens.DashBoardScreen
-import no.hiof.bachelor.premacare.ui.screens.LogScreen
+import no.hiof.bachelor.premacare.ui.screens.LoggScreen
 import no.hiof.bachelor.premacare.ui.screens.LoginScreen
 import no.hiof.bachelor.premacare.ui.screens.MessageScreen
 import no.hiof.bachelor.premacare.ui.screens.NewEntry
@@ -226,7 +226,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isBottomBarVisible.value = true
                 isTopAppVisible.value = true
                 isFloatingActionButtonVisible.value = true
-                LogScreen()
+                LoggScreen()
             }
 
 

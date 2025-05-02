@@ -107,7 +107,7 @@ fun DashBoardScreen() {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        contentPadding = PaddingValues(16.dp) // Optional, for spacing around the content
+        contentPadding = PaddingValues(16.dp)
     ) {
         item {
             SpaceEm(10.dp)
@@ -620,89 +620,14 @@ fun DashboardCard(
 
 
 //Vekt card uten animasjon
-//@Composable
-//fun WeightCard(
-//    currentIntake: Float,
-//    weight: Float,
-//    modifier: Modifier = Modifier
-//) {
-//    Card(
-//        modifier = Modifier
-//            .width(200.dp)
-//            .height(200.dp)
-//            .padding(8.dp),
-//        colors = CardDefaults.cardColors(containerColor = Color.White),
-//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-//    ) {
-//        Box(
-//            modifier = Modifier.fillMaxSize(),
-//            contentAlignment = Alignment.Center
-//        ) {
-//
-//            Column {
-//                Text(
-//                    text = "Barnets Vekt",
-//                    style = MaterialTheme.typography.bodyLarge.copy(
-//                        fontWeight = FontWeight.Bold
-//                    ),
-//                    color = Color.Black,
-//                    fontSize = 19.sp
-//                )
-//                SpaceEm(15.dp)
-//
-//                Text(
-//                    text = "$weight G",
-//                    style = MaterialTheme.typography.bodyLarge.copy(
-//                        fontWeight = FontWeight.Bold
-//                    ),
-//                    color = Color.Black,
-//                    fontSize = 27.sp
-//                )
-//            }
-//
-//
-//        }
-//    }
-//}
-
-//Vekt card med animasjon
-// når barnet er +1000g av siste vakt altså lagt på sef 1 kg vil det komme en pil opp animasjon
 @Composable
 fun WeightCard(
     currentIntake: Float,
     weight: Float,
     modifier: Modifier = Modifier
 ) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("arrowUp.json"))
-    val animationProgress by animateLottieCompositionAsState(
-        composition = composition,
-        iterations = 1
-    )
-
-    var showArrow by rememberSaveable { mutableStateOf(false) }
-    var lastShownWeight by rememberSaveable { mutableStateOf(weight) }
-    var hasInitialized by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(weight) {
-        // Første gang ignorer vi
-        if (!hasInitialized) {
-            hasInitialized = true
-            lastShownWeight = weight
-            return@LaunchedEffect
-        }
-
-        if ((weight - lastShownWeight) >= 1000f) {
-            showArrow = true
-            lastShownWeight = weight
-            delay(3000)
-            showArrow = false
-        } else if (weight != lastShownWeight) {
-            lastShownWeight = weight
-        }
-    }
-
     Card(
-        modifier = modifier
+        modifier = Modifier
             .width(200.dp)
             .height(200.dp)
             .padding(8.dp),
@@ -710,41 +635,116 @@ fun WeightCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Column {
                 Text(
                     text = "Barnets Vekt",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
                     color = Color.Black,
                     fontSize = 19.sp
                 )
-
-                Spacer(modifier = Modifier.height(15.dp))
+                SpaceEm(15.dp)
 
                 Text(
                     text = "$weight G",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
                     color = Color.Black,
                     fontSize = 27.sp
                 )
             }
 
-            if (showArrow) {
-                LottieAnimation(
-                    composition = composition,
-                    progress = { animationProgress },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(1f)
-                )
-            }
+
         }
     }
 }
+
+//Vekt card med animasjon
+// når barnet er +1000g av siste vakt altså lagt på sef 1 kg vil det komme en pil opp animasjon
+//@Composable
+//fun WeightCard(
+//    currentIntake: Float,
+//    weight: Float,
+//    modifier: Modifier = Modifier
+//) {
+//    val composition by rememberLottieComposition(LottieCompositionSpec.Asset("arrowUp.json"))
+//    val animationProgress by animateLottieCompositionAsState(
+//        composition = composition,
+//        iterations = 1
+//    )
+//
+//    var showArrow by rememberSaveable { mutableStateOf(false) }
+//    var lastShownWeight by rememberSaveable { mutableStateOf(weight) }
+//    var hasInitialized by rememberSaveable { mutableStateOf(false) }
+//
+//    LaunchedEffect(weight) {
+//        // Første gang ignorer vi
+//        if (!hasInitialized) {
+//            hasInitialized = true
+//            lastShownWeight = weight
+//            return@LaunchedEffect
+//        }
+//
+//        if ((weight - lastShownWeight) >= 1000f) {
+//            showArrow = true
+//            lastShownWeight = weight
+//            delay(3000)
+//            showArrow = false
+//        } else if (weight != lastShownWeight) {
+//            lastShownWeight = weight
+//        }
+//    }
+//
+//    Card(
+//        modifier = modifier
+//            .width(200.dp)
+//            .height(200.dp)
+//            .padding(8.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.White),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//                Text(
+//                    text = "Barnets Vekt",
+//                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+//                    color = Color.Black,
+//                    fontSize = 19.sp
+//                )
+//
+//                Spacer(modifier = Modifier.height(15.dp))
+//
+//                Text(
+//                    text = "$weight G",
+//                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+//                    color = Color.Black,
+//                    fontSize = 27.sp
+//                )
+//            }
+//
+//            if (showArrow) {
+//                LottieAnimation(
+//                    composition = composition,
+//                    progress = { animationProgress },
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .zIndex(1f)
+//                )
+//            }
+//        }
+//    }
+//}
 
 
 

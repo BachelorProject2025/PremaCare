@@ -205,13 +205,13 @@ fun NewEntry(ToDash: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Urinasjon")
+                    Text(" \uD83D\uDCA7 Urinasjon ")
                     RadioButton(
                         selected = firebaseViewModel.pee.value,
                         onClick = { firebaseViewModel.pee.value = true }
                     )
 
-                    Text("Avføring")
+                    Text(" \uD83D\uDCA9 Avføring")
                     RadioButton(
                         selected = firebaseViewModel.poo.value,
                         onClick = { firebaseViewModel.poo.value = true }
