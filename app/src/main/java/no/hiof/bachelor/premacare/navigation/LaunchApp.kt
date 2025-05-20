@@ -318,7 +318,7 @@ fun LaunchApp(auth: FirebaseAuth) {
 val items = listOf(
 
     BottomNavItems(AppScreens.DashBoard, Icons.Outlined.Dashboard, "Dashboard"),
-    BottomNavItems(AppScreens.Log, Icons.Outlined.List, "Log"),
+    BottomNavItems(AppScreens.Log, Icons.Outlined.List, "Logg"),
     BottomNavItems(AppScreens.Message, Icons.Outlined.Message, "Meldninger")
 
 )
