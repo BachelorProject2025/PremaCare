@@ -13,12 +13,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,6 +51,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -80,23 +83,38 @@ fun LoginScreen(
     val firebaseViewModel: FirebaseViewModel = viewModel()
     var showPassword by remember { mutableStateOf(false) }
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+
+    val boxHeight = if (screenHeight < 600.dp) {
+        100.dp   // Hvis skjermen er liten, sett boksen til 300 dp høyde
+    } else {
+        screenHeight * 0.75f  // Hvis skjermen er stor, sett boksen til 75% av skjermhøyden
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
 
-        Image(
-            painter = painterResource(water),
-            contentDescription = "Top background",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(280.dp)
-                .align(Alignment.TopCenter)
-        )
+      //  Image(
+      //      painter = painterResource(water),
+      //      contentDescription = "Top background",
+      //      contentScale = ContentScale.Crop,
+      //      modifier = Modifier
+      //          .fillMaxWidth()
+      //          .height(280.dp)
+      //          .align(Alignment.TopCenter)
+      //  )
+
+        ResponsiveTopImage(R.drawable.water)
 
         // White box starting from bottom and going up
         Box(
+
             modifier = Modifier
                 .fillMaxWidth()
-                .height(700.dp)
+                //.height(700.dp)
+                //.heightIn(min = 400.dp, max = screenHeight * 0.75f)
+                .height(boxHeight)
+
                 .align(Alignment.BottomCenter)
                 .background(
                     color = Color.White,
@@ -107,18 +125,24 @@ fun LoginScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 24.dp, vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Top //  viktig
             ) {
+                val spacerHeight = if (screenHeight < 600.dp) 4.dp else 16.dp
 
+                Spacer(modifier = Modifier.height(spacerHeight)) // Dynamisk
+
+                val logoSize = if (screenHeight < 600.dp) 80 else 150
 
                 DrawImg(
                     painter = painterResource(R.drawable.premacare),
                     contentDescription = "Logo",
                     modifier = Modifier,
-                    size = 150
+                    size = logoSize
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                val spacerHeightText = if (screenHeight < 600.dp) 1.dp else 8.dp
+                Spacer(modifier = Modifier.height(spacerHeightText))
 
                 Text(
                     text = "Logg inn",
@@ -235,7 +259,7 @@ fun AboutUsText(aboutUs: () -> Unit, text: String) {
         modifier =
         Modifier
             .clickable { aboutUs() }
-            .padding(50.dp)
+            .padding(30.dp)
     )
 }
 
@@ -315,7 +339,30 @@ fun DrawImg(painter: Painter, contentDescription: String, modifier: Modifier = M
         contentDescription = contentDescription,
         modifier = modifier
             .size(size.dp)
+
     )
+}
+
+// Tester ut litt responsvie design
+@Composable
+fun ResponsiveTopImage(water: Int) {
+    BoxWithConstraints {
+        val screenHeight = maxHeight
+        val imageHeight = screenHeight * 0.3f // 30%
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(imageHeight)
+        ) {
+            Image(
+                painter = painterResource(water),
+                contentDescription = "Top background",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
 }
 
 

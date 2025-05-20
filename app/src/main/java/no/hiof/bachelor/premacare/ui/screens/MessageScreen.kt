@@ -87,7 +87,7 @@ fun MessageBubble(text: String, senderId: String, parentName: String?) {
     val backgroundColor = if (senderId == "Sykepleier") {
         Color(0xFFEEEEEE) // Light grey for "Sykepleier"
     } else {
-        Color(0xFFBBDEFB) // Light blue for others (parents)
+        Color(0xFFBBDEFB) // Light blue for andre(Foreldre)
     }
 
     Box(
@@ -104,7 +104,7 @@ fun MessageBubble(text: String, senderId: String, parentName: String?) {
                 modifier = Modifier.align(Alignment.Start)
             )
 
-            Spacer(modifier = Modifier.height(4.dp)) // Space below the sender's name
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Main message text
             Text(text, color = Color.Black)

@@ -48,7 +48,7 @@ fun LoggScreen() {
     val cardColor = if (selectedIndex == 0) Color(0xFFF0F9FF)else Color(0xFFFFF7F0)
 
 
-    val labels = listOf("Dags logg", " Full Log")
+    val labels = listOf("Dags Logg", " Full Logg")
     val today = remember {
         SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }

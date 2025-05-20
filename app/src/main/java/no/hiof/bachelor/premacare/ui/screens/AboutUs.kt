@@ -106,7 +106,7 @@ private fun ContactForm() {
 
         Button(
             onClick = {
-                // TODO: Send e-post her
+
             },
             modifier = Modifier.align(Alignment.End)
         ) {
@@ -114,5 +114,6 @@ private fun ContactForm() {
         }
     }
 }
+
 
 

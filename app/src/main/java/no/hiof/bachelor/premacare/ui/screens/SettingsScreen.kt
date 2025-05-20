@@ -54,7 +54,9 @@ fun SettingsScreen(
         style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
-        modifier = Modifier.padding(horizontal = 130.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp) // litt padding for luft, ikke for sentrering
     )
 
 
