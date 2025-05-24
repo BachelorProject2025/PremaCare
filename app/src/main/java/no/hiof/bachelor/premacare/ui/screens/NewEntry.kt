@@ -42,11 +42,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,7 +83,7 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 1: Mengde melk ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.baby_blue)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -101,7 +103,7 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 2: Fôringsmetode ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.baby_blue)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -132,7 +134,7 @@ fun NewEntry(ToDash: () -> Unit) {
         // === CARD 3: Vekt (nytt kort for vekt) ===
         item {
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE4EC)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.baby_pink)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -192,7 +194,7 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 3: Urin og Avføring ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.baby_green)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -225,7 +227,7 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 5: Kommentar og Lagre-knapp ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.baby_yellow)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner

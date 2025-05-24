@@ -7,4 +7,38 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- ......... Top And Navbar ......... -->
+    <color name="top_and_navbar_blue">#FFE6F7FF</color>
+    <!-- Buttons -->
+    <color name="royal_blue">#FF1565C0</color>
+
+    <color name="clean_green">#FF4CAF50</color>
+
+    <!--- ........ newEntry ....... -->
+    <!-- milkCard -->
+    <color name="mint_blue">#FFE6F7FF</color>
+    <color name="baby_blue">#FFE3F2FD</color>
+    <!-- weightCard -->
+    <color name="baby_pink">#FFFCE4EC</color>
+    <!-- shirAndPeeCard -->
+    <color name="baby_green">#FFE8F5E9</color>
+    <!-- commetnCard -->
+    <color name="baby_yellow">#FFFFF9C4</color>
+
+    <!-- ......... card alternative colors ....... -->
+
+    <!-- milkCard -->
+
+    <!-- weightCard -->
+
+    <!-- shirAndPeeCard -->
+
+    <!-- commetnCard -->
+
+
+
+
+
+
 </resources>

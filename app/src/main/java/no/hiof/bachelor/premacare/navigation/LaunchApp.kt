@@ -91,7 +91,7 @@ fun LaunchApp(auth: FirebaseAuth) {
             Column(
                 //.background(Color(0xFF50D4F2))
                 modifier = Modifier
-                    .background(Color(0xFFE6F7FF))
+                    .background(colorResource(R.color.top_and_navbar_blue))
                     .fillMaxWidth()
                     .padding(
                         top = WindowInsets.statusBars
@@ -170,7 +170,7 @@ fun LaunchApp(auth: FirebaseAuth) {
     }, bottomBar = {
         if (isBottomBarVisible.value) {
             //ice blue Color(0xFFE6F7FF)
-            BottomAppBar(containerColor = Color(0xFFE6F7FF)) {
+            BottomAppBar(containerColor = colorResource(R.color.top_and_navbar_blue)) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()

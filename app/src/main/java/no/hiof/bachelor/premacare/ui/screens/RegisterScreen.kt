@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 
@@ -311,7 +313,7 @@ fun RegisterScreen(toLogin: () -> Unit) {
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1565C0),
+                    containerColor = colorResource(R.color.royal_blue),
                     contentColor = Color.White
                 ),
                 elevation = ButtonDefaults.buttonElevation(
