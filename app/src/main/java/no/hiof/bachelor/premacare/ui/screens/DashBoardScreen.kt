@@ -64,6 +64,8 @@ import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.zIndex
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -184,7 +186,7 @@ fun CallButton() {
                 context.startActivity(intent)
             }
         },
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.clean_green)),
         modifier = Modifier.padding(16.dp)
     ) {
         Text("Ring Sykehuset", color = Color.White)
@@ -558,10 +560,15 @@ fun DashboardCard(
         lastIntake = currentIntake
     }
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val isSmallScreen = screenHeight < 700.dp
+
+    val cardSize = if (isSmallScreen) 160.dp else 200.dp
+
     Card(
         modifier = modifier
-            .width(200.dp)
-            .height(200.dp)
+            .size(cardSize)
             .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -594,13 +601,15 @@ fun DashboardCard(
                 )
             }
 
+            val TextSize = if (isSmallScreen) 20.sp else 27.sp
+
             Text(
                 text = "${currentIntake} ml",
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold
                 ),
                 color = Color.Black,
-                fontSize = 27.sp
+                fontSize = TextSize
             )
 
             // Confetti lagt som øverste lag
@@ -626,10 +635,15 @@ fun WeightCard(
     weight: Float,
     modifier: Modifier = Modifier
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val isSmallScreen = screenHeight < 700.dp
+
+    val cardSize = if (isSmallScreen) 160.dp else 200.dp
+
     Card(
-        modifier = Modifier
-            .width(200.dp)
-            .height(200.dp)
+        modifier = modifier
+            .size(cardSize)
             .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -640,15 +654,20 @@ fun WeightCard(
         ) {
 
             Column {
+                val TextSizeHead = if (isSmallScreen) 12.sp else 19.sp
+
                 Text(
+
                     text = "Barnets Vekt",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
                     color = Color.Black,
-                    fontSize = 19.sp
+                    fontSize = TextSizeHead
                 )
                 SpaceEm(15.dp)
+
+                val TextSize = if (isSmallScreen) 20.sp else 27.sp
 
                 Text(
                     text = "$weight G",
@@ -656,7 +675,7 @@ fun WeightCard(
                         fontWeight = FontWeight.Bold
                     ),
                     color = Color.Black,
-                    fontSize = 27.sp
+                    fontSize = TextSize
                 )
             }
 

@@ -22,12 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 @Composable
@@ -93,7 +95,7 @@ fun CoParentScreen(
                 )
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF1565C0),
+                containerColor = colorResource(R.color.royal_blue),
                 contentColor = Color.White
             ),
             elevation = ButtonDefaults.buttonElevation(

@@ -23,8 +23,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -86,10 +88,10 @@ fun LoginScreen(
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
-    val boxHeight = if (screenHeight < 600.dp) {
-        100.dp   // Hvis skjermen er liten, sett boksen til 300 dp høyde
+    val boxHeight = if (screenHeight < 700.dp) {
+        screenHeight * 0.80f
     } else {
-        screenHeight * 0.75f  // Hvis skjermen er stor, sett boksen til 75% av skjermhøyden
+        screenHeight * 0.75f
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -124,15 +126,15 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 32.dp),
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top //  viktig
             ) {
-                val spacerHeight = if (screenHeight < 600.dp) 4.dp else 16.dp
+                val spacerHeight = if (screenHeight < 700.dp) 4.dp else 16.dp
 
                 Spacer(modifier = Modifier.height(spacerHeight)) // Dynamisk
 
-                val logoSize = if (screenHeight < 600.dp) 80 else 150
+                val logoSize = if (screenHeight < 700.dp) 100 else 150
 
                 DrawImg(
                     painter = painterResource(R.drawable.premacare),
@@ -141,7 +143,7 @@ fun LoginScreen(
                     size = logoSize
                 )
 
-                val spacerHeightText = if (screenHeight < 600.dp) 1.dp else 8.dp
+                val spacerHeightText = if (screenHeight < 700.dp) 1.dp else 8.dp
                 Spacer(modifier = Modifier.height(spacerHeightText))
 
                 Text(
@@ -301,7 +303,7 @@ fun ButtonWithToast(
             }
         },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF1565C0),
+            containerColor = colorResource(R.color.royal_blue),
             contentColor = Color.White
         ),
         elevation = ButtonDefaults.buttonElevation(
@@ -347,8 +349,11 @@ fun DrawImg(painter: Painter, contentDescription: String, modifier: Modifier = M
 @Composable
 fun ResponsiveTopImage(water: Int) {
     BoxWithConstraints {
-        val screenHeight = maxHeight
-        val imageHeight = screenHeight * 0.3f // 30%
+        val imageHeight = if (maxHeight < 600.dp) {
+            maxHeight * 0.15f // Smaller height for small screens
+        } else {
+            maxHeight * 0.3f // Default height for normal/bigger screens
+        }
 
         Box(
             modifier = Modifier
