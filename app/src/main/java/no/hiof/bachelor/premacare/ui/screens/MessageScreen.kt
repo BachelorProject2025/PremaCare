@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -64,18 +66,28 @@ fun MessageScreen() {
             )
         }
 
-        Button(
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+        OutlinedButton(
             onClick = {
                 if (message.text.isNotBlank()) {
                     firebaseViewModel.sendMessage(message.text)
                     message = TextFieldValue()
                 }
-            }
+            },
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color(0xFF4CAF50) // Fargen på tekst og ikon
+            ),
+            border = ButtonDefaults.outlinedButtonBorder.copy(
+                brush = androidx.compose.ui.graphics.SolidColor(Color(0xFF4CAF50))
+            )
         ) {
+            Icon(
+                imageVector = Icons.Filled.Send,
+                contentDescription = "Send ikon"
+            )
+            Spacer(modifier = Modifier.width(8.dp))
             Text("Send")
         }
     }

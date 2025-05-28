@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.Inventory
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.Settings
@@ -113,12 +114,12 @@ fun LaunchApp(auth: FirebaseAuth) {
                             else -> {
 
                                 Image(
-                                    painter = painterResource(id = R.drawable.prema_care_white),
+                                    painter = painterResource(id = R.drawable.premacare),
                                     contentDescription = "App Logo",
                                     modifier = Modifier
                                         .height(100.dp)
                                         .width(200.dp),
-                                    colorFilter = ColorFilter.tint(Color(0xFF0077B6))
+                                    //colorFilter = ColorFilter.tint(Color(0xFF0077B6))
 
                                 )
                             }
@@ -318,6 +319,7 @@ fun LaunchApp(auth: FirebaseAuth) {
 val items = listOf(
 
     BottomNavItems(AppScreens.DashBoard, Icons.Outlined.Dashboard, "Dashboard"),
+    //BottomNavItems(AppScreens.DashBoard, Icons.Outlined.Inventory, "Bestilling"),
     BottomNavItems(AppScreens.Log, Icons.Outlined.List, "Logg"),
     BottomNavItems(AppScreens.Message, Icons.Outlined.Message, "Meldninger")
 
@@ -339,6 +341,7 @@ private fun determineStartDestination(currentUser: FirebaseUser?): String {
 @Composable
 fun SearchFloatingAction( toEntry: ()-> Unit) {
     FloatingActionButton(onClick = { toEntry()},
+        //Color.DarkGray,
         containerColor = Color.DarkGray,
         contentColor = Color.White
 
