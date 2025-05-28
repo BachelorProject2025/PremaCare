@@ -653,14 +653,18 @@ fun DashboardCard(
 
             val TextSize = if (isSmallScreen) 20.sp else 27.sp
 
-            Text(
-                text = "${currentIntake} ml",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = Color.Black,
-                fontSize = TextSize
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${currentIntake} ml",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+                Text(
+                    text = "Total pr døgn",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
 
             // Confetti lagt som øverste lag
             if (currentIntake >= max) {
@@ -823,10 +827,17 @@ fun WeightGraphCard(
     modifier: Modifier = Modifier
 ) {
     val maxPoints = 30
-    val displayedWeights = if (weightHistory.size > maxPoints) {
-        weightHistory.takeLast(maxPoints)
+    // legger til et filter her slik at ikke måltider uten ny vekt blir ny node. siden ny
+    //Oppføring vill regnes også som ny vekt blir en ny node i grafen fremvist.
+    // Ved utfiltrering slipper vi dette.
+    val filteredWeights = weightHistory.fold(mutableListOf<Float>()) { acc, value ->
+        if (acc.lastOrNull() != value) acc.add(value)
+        acc
+    }
+    val displayedWeights = if (filteredWeights.size > maxPoints) {
+        filteredWeights.takeLast(maxPoints)
     } else {
-        weightHistory
+        filteredWeights
     }
 
     Card(
@@ -845,7 +856,7 @@ fun WeightGraphCard(
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold
                 ),
-                color = Color.White,
+                color = Color.Black ,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -889,7 +900,11 @@ fun WeightGraphCard(
                     }
                 }
             } else {
-                Text("Ingen vekt", color = Color.Gray)
+                if (displayedWeights.size < 1) {
+                    Text("Ingen vekt", color = Color.Gray)
+                }else {
+                      Text("Minst to vektoppføringer", color = Color.Gray)
+                }
             }
         }
     }

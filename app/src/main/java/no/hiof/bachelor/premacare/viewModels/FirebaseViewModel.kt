@@ -341,6 +341,34 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+    // Slette en feeding
+    fun deleteFeedingRecord(record: FeedingRecord) {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            firestore.collection("users")
+                .document(userId)
+                .collection("feedingRecords")
+                .whereEqualTo("amount", record.amount)
+                .whereEqualTo("weight", record.weight)
+                .whereEqualTo("date", record.date)
+                .whereEqualTo("pee", record.pee)
+                .whereEqualTo("poo", record.poo)
+                .whereEqualTo("comment", record.comment)
+                .limit(1) // Veldig viktig – bare slett én!
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        querySnapshot.documents[0].reference.delete()
+                    }
+                }
+                .addOnFailureListener {
+                    println("Feil ved sletting: ${it.message}")
+                }
+        }
+    }
+
+
     // Henter feedings
     fun fetchFeedingRecords() {
         val currentUser = auth.currentUser
