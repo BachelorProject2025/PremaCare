@@ -144,8 +144,9 @@ fun LoggCard(record: FeedingRecord, backgroundColor: Color) {
                     style = MaterialTheme.typography.labelLarge,
                     color = Color(0xFF607D8B)
                 )
+                val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
                 Text(
-                    text = record.time.toDate().toLocaleString(),
+                    text = timeFormat.format(record.time.toDate()),
                     style = MaterialTheme.typography.labelMedium,
                     color = Color(0xFF90A4AE)
                 )
@@ -157,7 +158,7 @@ fun LoggCard(record: FeedingRecord, backgroundColor: Color) {
             Text(
                 text = record.feedingMethod,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
+                color = Color.Black
             )
 
             Spacer(modifier = Modifier.height(12.dp))

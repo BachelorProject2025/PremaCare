@@ -158,7 +158,8 @@ fun RegisterScreen(toLogin: () -> Unit) {
                     .fillMaxWidth()
                     .padding(7.dp)
                     .shadow(8.dp, shape = RoundedCornerShape(5.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE4EC)),
+                //0xFFFCE4EC
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFBBDEFB)),
                 shape = RoundedCornerShape(5.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
@@ -209,7 +210,8 @@ fun RegisterScreen(toLogin: () -> Unit) {
                     .fillMaxWidth()
                     .padding(7.dp)
                     .shadow(8.dp, shape = RoundedCornerShape(5.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                //0xFFE8F5E9
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                 shape = RoundedCornerShape(5.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {

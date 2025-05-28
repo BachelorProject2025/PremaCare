@@ -7,6 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="neutral_blue">#FFEAF1F8</color>
+    <color name="strong_neutral">#FFB0BEC5</color>
+    <color name="coffie">#FFB08968</color>
+    <color name="not_intense_red">#E57373</color>
+    <color name="amber">#FFA000</color>
+    <color name="peach">#FFDAB9</color>
+    <color name="warm_apricot">#F4A261</color>
 
     <!-- ......... Top And Navbar ......... -->
     <color name="top_and_navbar_blue">#FFE6F7FF</color>
@@ -28,13 +35,11 @@
 
     <!-- ......... card alternative colors ....... -->
 
-    <!-- milkCard -->
 
-    <!-- weightCard -->
+    <color name="blue_grey">#FFEFF4FB</color> <!-- Lys, nesten gråblå -->
 
-    <!-- shirAndPeeCard -->
+    <color name="diffrent_blue_grey">#FFD9E4F5</color> <!-- Fortsatt dempet, men skiller seg svakt -->
 
-    <!-- commetnCard -->
 
 
 
