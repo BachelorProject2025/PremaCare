@@ -341,6 +341,34 @@ class FirebaseViewModel : ViewModel() {
         }
     }
 
+    // Slette en feeding
+    fun deleteFeedingRecord(record: FeedingRecord) {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            val userId = user.uid
+            firestore.collection("users")
+                .document(userId)
+                .collection("feedingRecords")
+                .whereEqualTo("amount", record.amount)
+                .whereEqualTo("weight", record.weight)
+                .whereEqualTo("date", record.date)
+                .whereEqualTo("pee", record.pee)
+                .whereEqualTo("poo", record.poo)
+                .whereEqualTo("comment", record.comment)
+                .limit(1) // Veldig viktig – bare slett én!
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    if (!querySnapshot.isEmpty) {
+                        querySnapshot.documents[0].reference.delete()
+                    }
+                }
+                .addOnFailureListener {
+                    println("Feil ved sletting: ${it.message}")
+                }
+        }
+    }
+
+
     // Henter feedings
     fun fetchFeedingRecords() {
         val currentUser = auth.currentUser
@@ -363,10 +391,38 @@ class FirebaseViewModel : ViewModel() {
                             doc.toObject(FeedingRecord::class.java)
                         }
                         isLoading = false
+
                     }
                 }
         }
     }
+
+    fun fetchFeedingRecordWeights() {
+        val currentUser = auth.currentUser
+        currentUser?.let { user ->
+            isLoading = true
+            val userId = user.uid
+            firestore.collection("users")
+                .document(userId)
+                .collection("feedingRecords")
+                .orderBy("time", Query.Direction.ASCENDING)  // Viktig for vekthistorikk
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val weights = snapshot.documents.mapNotNull { doc ->
+                        val weight = doc.getDouble("weight") // eller getLong hvis lagret som Int
+                        weight?.toFloat()
+                    }
+                    _weightHistory.value = weights
+                    isLoading = false
+                    Log.d("DEBUG", "Weights hentet: $weights")
+                }
+                .addOnFailureListener { e ->
+                    println("Error fetching feeding record weights: ${e.message}")
+                    isLoading = false
+                }
+        }
+    }
+
 
 
     private val _currentIntake = MutableLiveData<Float>()
@@ -431,6 +487,23 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
+
+
+
+    private val _weightHistory = MutableLiveData<List<Float>>(emptyList())
+    val weightHistory: LiveData<List<Float>> = _weightHistory
+
+    //vekt historikk
+    fun fetchWeightHistory() {
+        val newData = feedingRecords
+            .filter { it.weight > 0 }
+            .sortedBy { it.time.toDate() }
+            .map { it.weight.toFloat() }
+
+        _weightHistory.value = newData
+    }
+
+
 
 
     //------------------ Message ----------------------

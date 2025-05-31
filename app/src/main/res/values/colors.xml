@@ -7,4 +7,43 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="neutral_blue">#FFEAF1F8</color>
+    <color name="strong_neutral">#FFB0BEC5</color>
+    <color name="coffie">#FFB08968</color>
+    <color name="not_intense_red">#E57373</color>
+    <color name="amber">#FFA000</color>
+    <color name="peach">#FFDAB9</color>
+    <color name="warm_apricot">#F4A261</color>
+
+    <!-- ......... Top And Navbar ......... -->
+    <color name="top_and_navbar_blue">#FFE6F7FF</color>
+    <!-- Buttons -->
+    <color name="royal_blue">#FF1565C0</color>
+
+    <color name="clean_green">#FF4CAF50</color>
+
+    <!--- ........ newEntry ....... -->
+    <!-- milkCard -->
+    <color name="mint_blue">#FFE6F7FF</color>
+    <color name="baby_blue">#FFE3F2FD</color>
+    <!-- weightCard -->
+    <color name="baby_pink">#FFFCE4EC</color>
+    <!-- shirAndPeeCard -->
+    <color name="baby_green">#FFE8F5E9</color>
+    <!-- commetnCard -->
+    <color name="baby_yellow">#FFFFF9C4</color>
+
+    <!-- ......... card alternative colors ....... -->
+
+
+    <color name="blue_grey">#FFEFF4FB</color> <!-- Lys, nesten gråblå -->
+
+    <color name="diffrent_blue_grey">#FFD9E4F5</color> <!-- Fortsatt dempet, men skiller seg svakt -->
+
+
+
+
+
+
+
 </resources>

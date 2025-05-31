@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,9 +26,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -35,6 +38,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -64,6 +68,9 @@ import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.zIndex
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -87,6 +94,10 @@ fun DashBoardScreen() {
 
     val currentIntake by firebaseViewModel.currentIntake.observeAsState(0.0f) // Default value
     val currentWeight by firebaseViewModel.lastWeight.observeAsState(0.0f)
+    val weightHistory by firebaseViewModel.weightHistory.observeAsState(emptyList())
+
+
+
 
     LaunchedEffect(Unit) {
         val effectiveUserId = getEffectiveUserIdSuspend()
@@ -98,6 +109,7 @@ fun DashBoardScreen() {
             firebaseViewModel.getLastWeight()
             firebaseViewModel.fetchChildsName()
             firebaseViewModel.fetchMemberSinceDate()
+            firebaseViewModel.fetchFeedingRecordWeights()
             Log.d("DEBUG", "Data hentet for bruker-ID: $effectiveUserId")
         } else {
             Log.e("ERROR", "Ingen gyldig effektiv bruker-ID funnet!")
@@ -116,7 +128,7 @@ fun DashBoardScreen() {
         item {
             Column(horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center) {
-                Text(fontSize = 18.sp, text = "Forelder/Foresatt av:")
+                //Text(fontSize = 18.sp, text = "Forelder/Foresatt av:")
 
                 //bare for å teste å hente ut barns navn
                 SpaceEm(10.dp)
@@ -143,6 +155,13 @@ fun DashBoardScreen() {
                     weight = currentWeight.toFloat()
                 )
             }
+        }
+        item {
+
+            val lineColor = colorResource(id = R.color.royal_blue)
+            val ponitColor = colorResource(id = R.color.royal_blue)
+            WeightGraphCard(weightHistory,lineColor, ponitColor  )
+
         }
 
         item {
@@ -171,25 +190,56 @@ fun DashBoardScreen() {
 }
 
 
+//@Composable
+//fun CallButton() {
+//    val context = LocalContext.current
+//    val phoneNumber = "tel:+4741282999" // Erstatt med telefonnummeret til sykehuset
+//    val coroutineScope = rememberCoroutineScope()  // Husk å bruke CoroutineScope
+//
+//    Button(
+//        onClick = {
+//            coroutineScope.launch {
+//                val intent = Intent(Intent.ACTION_DIAL, Uri.parse(phoneNumber))
+//                context.startActivity(intent)
+//            }
+//        },
+//        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.clean_green)),
+//        modifier = Modifier.padding(16.dp)
+//    ) {
+//        Text("Ring Sykehuset", color = Color.White)
+//    }
+//}
+
 @Composable
 fun CallButton() {
     val context = LocalContext.current
-    val phoneNumber = "tel:+4741282999" // Erstatt med telefonnummeret til sykehuset
-    val coroutineScope = rememberCoroutineScope()  // Husk å bruke CoroutineScope
+    val phoneNumber = "tel:+4741282999"
+    val coroutineScope = rememberCoroutineScope()
 
-    Button(
+    OutlinedButton(
         onClick = {
             coroutineScope.launch {
                 val intent = Intent(Intent.ACTION_DIAL, Uri.parse(phoneNumber))
                 context.startActivity(intent)
             }
         },
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
-        modifier = Modifier.padding(16.dp)
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = colorResource(R.color.clean_green)
+        ),
+        border = BorderStroke(1.dp, colorResource(R.color.clean_green)),
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
     ) {
-        Text("Ring Sykehuset", color = Color.White)
+        Icon(
+            imageVector = Icons.Default.Phone,
+            contentDescription = "Ring sykehuset"
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("Ring sykehuset")
     }
 }
+
 
 @Composable
 fun HorizontalLine() {
@@ -511,7 +561,7 @@ fun DashboardCard(
 
     // Kalkulasjon progress basert på currentIntake og max value
     val progress = (currentIntake / max).coerceIn(0f, 1f)
-    val progressColor = if (currentIntake >= min) Color.Green else Color.Red
+    val progressColor = if (currentIntake >= min) Color.Green else colorResource(R.color.not_intense_red)
     val animatedProgress = remember { androidx.compose.animation.core.Animatable(0f) }
 
     // Confetti-animasjon
@@ -558,20 +608,27 @@ fun DashboardCard(
         lastIntake = currentIntake
     }
 
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val isSmallScreen = screenHeight < 700.dp
+
+    val cardSize = if (isSmallScreen) 160.dp else 200.dp
+
     Card(
         modifier = modifier
-            .width(200.dp)
-            .height(200.dp)
+            .size(cardSize)
             .padding(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
+
             Canvas(
                 modifier = Modifier.size(140.dp)
             ) {
@@ -594,14 +651,20 @@ fun DashboardCard(
                 )
             }
 
-            Text(
-                text = "${currentIntake} ml",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = FontWeight.Bold
-                ),
-                color = Color.Black,
-                fontSize = 27.sp
-            )
+            val TextSize = if (isSmallScreen) 20.sp else 27.sp
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${currentIntake} ml",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black
+                )
+                Text(
+                    text = "Total pr døgn",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
+                )
+            }
 
             // Confetti lagt som øverste lag
             if (currentIntake >= max) {
@@ -626,12 +689,17 @@ fun WeightCard(
     weight: Float,
     modifier: Modifier = Modifier
 ) {
+    val configuration = LocalConfiguration.current
+    val screenHeight = configuration.screenHeightDp.dp
+    val isSmallScreen = screenHeight < 700.dp
+
+    val cardSize = if (isSmallScreen) 160.dp else 200.dp
+
     Card(
-        modifier = Modifier
-            .width(200.dp)
-            .height(200.dp)
+        modifier = modifier
+            .size(cardSize)
             .padding(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.white)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Box(
@@ -640,23 +708,28 @@ fun WeightCard(
         ) {
 
             Column {
+                val TextSizeHead = if (isSmallScreen) 12.sp else 19.sp
+
                 Text(
+
                     text = "Barnets Vekt",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
                     color = Color.Black,
-                    fontSize = 19.sp
+                    fontSize = TextSizeHead
                 )
                 SpaceEm(15.dp)
 
+                val TextSize = if (isSmallScreen) 20.sp else 27.sp
+
                 Text(
-                    text = "$weight G",
+                    text = "$weight g",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.Bold
                     ),
                     color = Color.Black,
-                    fontSize = 27.sp
+                    fontSize = TextSize
                 )
             }
 
@@ -745,6 +818,100 @@ fun WeightCard(
 //        }
 //    }
 //}
+
+@Composable
+fun WeightGraphCard(
+    weightHistory: List<Float>,
+    lineColor: Color,
+    pointColor: Color,
+    modifier: Modifier = Modifier
+) {
+    val maxPoints = 30
+    // legger til et filter her slik at ikke måltider uten ny vekt blir ny node. siden ny
+    //Oppføring vill regnes også som ny vekt blir en ny node i grafen fremvist.
+    // Ved utfiltrering slipper vi dette.
+    val filteredWeights = weightHistory.fold(mutableListOf<Float>()) { acc, value ->
+        if (acc.lastOrNull() != value) acc.add(value)
+        acc
+    }
+    val displayedWeights = if (filteredWeights.size > maxPoints) {
+        filteredWeights.takeLast(maxPoints)
+    } else {
+        filteredWeights
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(containerColor = colorResource(R.color.white)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Vektutvikling",
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold
+                ),
+                color = Color.Black ,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (displayedWeights.size > 1) {
+                Canvas(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)) {
+
+                    val maxWeight = displayedWeights.maxOrNull() ?: 0f
+                    val minWeight = displayedWeights.minOrNull() ?: 0f
+                    val range = (maxWeight - minWeight).coerceAtLeast(1f)
+                    val spacing = size.width / (displayedWeights.size - 1)
+
+                    val points = displayedWeights.mapIndexed { index, value ->
+                        val x = index * spacing
+                        val y = size.height - ((value - minWeight) / range) * size.height
+                        Offset(x, y)
+                    }
+
+                    // Draw line
+                    for (i in 0 until points.size - 1) {
+                        drawLine(
+                            color = lineColor,
+                            start = points[i],
+                            end = points[i + 1],
+                            strokeWidth = 4f
+                        )
+                    }
+
+                    // Draw points
+                    points.forEach { point ->
+                        drawCircle(
+                            color = pointColor,
+                            radius = 6f,
+                            center = point
+                        )
+                    }
+                }
+            } else {
+                if (displayedWeights.size < 1) {
+                    Text("Ingen vekt", color = Color.Gray)
+                }else {
+                      Text("Minst to vektoppføringer", color = Color.Gray)
+                }
+            }
+        }
+    }
+}
+
+
+
 
 
 

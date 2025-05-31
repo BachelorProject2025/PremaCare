@@ -1,7 +1,11 @@
 package no.hiof.bachelor.premacare.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
@@ -42,11 +47,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,7 +88,8 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 1: Mengde melk ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                //baby_blue
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.blue_grey)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -93,7 +101,12 @@ fun NewEntry(ToDash: () -> Unit) {
                     Slider(
                         value = firebaseViewModel.amount.value.toFloat(),
                         onValueChange = { firebaseViewModel.amount.value = it.toInt() },
-                        valueRange = 0f..170f
+                        valueRange = 0f..170f,
+                        colors = SliderDefaults.colors(
+                            thumbColor = Color(0xFF1565C0),         // royal_blue
+                            activeTrackColor = Color(0xFF1565C0),
+                            inactiveTrackColor = Color(0xFFB0BEC5)  // Lys gråblå til bakgrunn
+                        )
                     )
                 }
             }
@@ -101,7 +114,7 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 2: Fôringsmetode ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.blue_grey)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -132,7 +145,8 @@ fun NewEntry(ToDash: () -> Unit) {
         // === CARD 3: Vekt (nytt kort for vekt) ===
         item {
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE4EC)),
+                //baby_pink
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.diffrent_blue_grey)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -192,11 +206,11 @@ fun NewEntry(ToDash: () -> Unit) {
         item {
             // === CARD 3: Urin og Avføring ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.blue_grey)),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
-                    .clip(RoundedCornerShape(12.dp)) // Avrundede kanter på kortet
+                    .shadow(8.dp, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
             ) {
                 Row(
                     modifier = Modifier
@@ -205,16 +219,18 @@ fun NewEntry(ToDash: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(" \uD83D\uDCA7 Urinasjon ")
-                    RadioButton(
+                    OutlinedToggleButton(
+                        text = "Tisset",
+                        emoji = "\uD83D\uDCA7",
                         selected = firebaseViewModel.pee.value,
-                        onClick = { firebaseViewModel.pee.value = true }
+                        onToggle = { firebaseViewModel.pee.value = !firebaseViewModel.pee.value }
                     )
 
-                    Text(" \uD83D\uDCA9 Avføring")
-                    RadioButton(
+                    OutlinedToggleButton(
+                        text = "Bæsjet",
+                        emoji = "\uD83D\uDCA9",
                         selected = firebaseViewModel.poo.value,
-                        onClick = { firebaseViewModel.poo.value = true }
+                        onToggle = { firebaseViewModel.poo.value = !firebaseViewModel.poo.value }
                     )
                 }
             }
@@ -222,10 +238,12 @@ fun NewEntry(ToDash: () -> Unit) {
 
 
 
+
         item {
             // === CARD 5: Kommentar og Lagre-knapp ===
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)),
+                //baby_yellow
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.diffrent_blue_grey)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(8.dp, RoundedCornerShape(12.dp)) // Skygge og avrundede hjørner
@@ -275,4 +293,33 @@ fun NewEntry(ToDash: () -> Unit) {
 
 
 }
+
+
+
+@Composable
+fun OutlinedToggleButton(
+    text: String,
+    emoji: String,
+    selected: Boolean,
+    onToggle: () -> Unit
+) {
+    val borderColor = if (selected) Color(0xFF1565C0) else Color(0xFFB0BEC5)
+    val backgroundColor = if (selected) Color(0x1A1565C0) else Color.Transparent
+    val textColor = if (selected) Color(0xFF1565C0) else Color.Black
+
+    OutlinedButton(
+        onClick = onToggle,
+        shape = RoundedCornerShape(20.dp),
+        border = BorderStroke(2.dp, borderColor),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = backgroundColor,
+            contentColor = textColor
+        ),
+        modifier = Modifier.height(48.dp)
+    ) {
+        Text("$emoji $text")
+    }
+}
+
+
 
