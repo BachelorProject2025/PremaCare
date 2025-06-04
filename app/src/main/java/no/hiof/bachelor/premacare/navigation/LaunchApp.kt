@@ -62,6 +62,7 @@ import com.google.firebase.auth.FirebaseUser
 import no.hiof.bachelor.premacare.R
 import no.hiof.bachelor.premacare.ui.screens.AboutUs
 import no.hiof.bachelor.premacare.ui.screens.DashBoardScreen
+import no.hiof.bachelor.premacare.ui.screens.EmergencyCheckScreen
 import no.hiof.bachelor.premacare.ui.screens.LoggScreen
 import no.hiof.bachelor.premacare.ui.screens.LoginScreen
 import no.hiof.bachelor.premacare.ui.screens.MessageScreen
@@ -274,7 +275,7 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isBottomBarVisible.value = true
                 isTopAppVisible.value = true
                 isFloatingActionButtonVisible.value = true
-                DashBoardScreen()
+                DashBoardScreen(takeMeToEc = {navController.navigate(AppScreens.EmergencyCheck.name)})
             }
 
             composable(AppScreens.NewEntry.name) {
@@ -308,6 +309,13 @@ fun LaunchApp(auth: FirebaseAuth) {
                 isFloatingActionButtonVisible.value = true
                 CoParentScreen(auth.currentUser?.uid.toString(),
                     {navController.navigate(AppScreens.DashBoard.name)})
+            }
+
+            composable(AppScreens.EmergencyCheck.name) {
+                isBottomBarVisible.value = false
+                isTopAppVisible.value = false
+                isFloatingActionButtonVisible.value = false
+                EmergencyCheckScreen()
             }
 
         }
