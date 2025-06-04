@@ -10,5 +10,6 @@ enum class AppScreens {
     Reset,
     Message,
     Settings,
-    CoParent
+    CoParent,
+    EmergencyCheck
 }

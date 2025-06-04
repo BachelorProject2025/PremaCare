@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -89,7 +90,7 @@ import java.util.Locale
 
 
 @Composable
-fun DashBoardScreen() {
+fun DashBoardScreen(takeMeToEc: () -> Unit) {
     val firebaseViewModel: FirebaseViewModel = viewModel()
 
     val currentIntake by firebaseViewModel.currentIntake.observeAsState(0.0f) // Default value
@@ -164,11 +165,16 @@ fun DashBoardScreen() {
 
         }
 
+      //  item {
+      //      EmergencyCheckButton(takeMeToEc)
+      //  }
+
         item {
             SpaceEm(20.dp)
             HorizontalLine()
             SpaceEm(10.dp)
         }
+
 
         item {
             Text(color = Color.Black, text = "Nyttige Lenker", fontSize = 22.sp)
@@ -909,6 +915,22 @@ fun WeightGraphCard(
         }
     }
 }
+
+@Composable
+fun EmergencyCheckButton(takeMeToEc: () -> Unit) {
+    Button(
+        onClick = { takeMeToEc() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+    ) {
+        Icon(Icons.Default.Warning, contentDescription = null, tint = Color.White)
+        Spacer(Modifier.width(8.dp))
+        Text("Sjekk sonden", color = Color.White)
+    }
+}
+
 
 
 
