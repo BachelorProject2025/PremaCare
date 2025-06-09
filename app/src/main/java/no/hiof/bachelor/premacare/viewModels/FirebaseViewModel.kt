@@ -548,6 +548,30 @@ class FirebaseViewModel : ViewModel() {
 
     // I FirebaseViewModel.kt
 
+   //fun fetchMessagesRealtime() {
+   //    val userId = auth.currentUser?.uid ?: return
+   //    val messagesRef = firestore.collection("users")
+   //        .document(userId)
+   //        .collection("messages")
+   //        .orderBy("timestamp")
+
+   //    messagesRef.addSnapshotListener { snapshot, error ->
+   //        if (error != null) {
+   //            println("Error fetching messages: ${error.message}")
+   //            return@addSnapshotListener
+   //        }
+
+   //        val messageList = snapshot?.toObjects(Message::class.java) ?: emptyList()
+   //        _messages.value = messageList
+
+   //        // Sjekk etter uleste meldinger
+   //        val hasUnread = messageList.any { !it.isRead && it.senderid == "Sykepleier" }
+   //        _hasUnreadMessages.value = hasUnread // <-- Den skal være her!
+   //        Log.d("PremaCareApp", "Calculated hasUnreadMessages: $hasUnread. Current _hasUnreadMessages.value: ${_hasUnreadMessages.value}")
+
+   //    }
+   //}
+
     fun fetchMessagesRealtime() {
         val userId = auth.currentUser?.uid ?: return
         val messagesRef = firestore.collection("users")
@@ -555,20 +579,53 @@ class FirebaseViewModel : ViewModel() {
             .collection("messages")
             .orderBy("timestamp")
 
+        Log.d("PremaCareApp", "fetchMessagesRealtime called for userId: $userId") // Ny logg for å bekrefte kall
+
         messagesRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                println("Error fetching messages: ${error.message}")
+                // Bruk Log.e for feil, ikke println
+                Log.e("PremaCareApp", "Error fetching messages: ${error.message}")
                 return@addSnapshotListener
             }
 
-            val messageList = snapshot?.toObjects(Message::class.java) ?: emptyList()
+            // ***** VIKTIG: Sjekk snapshot før toObjects() *****
+            if (snapshot == null) {
+                Log.d("PremaCareApp", "Snapshot is null. No messages.")
+                _messages.value = emptyList()
+                _hasUnreadMessages.value = false
+                return@addSnapshotListener
+            }
+            if (snapshot.isEmpty) {
+                Log.d("PremaCareApp", "Snapshot is empty. No messages found in collection.")
+                _messages.value = emptyList()
+                _hasUnreadMessages.value = false
+                return@addSnapshotListener
+            }
+
+            // ***** NY VIKTIG LOGG: Rådata fra Firestore *****
+            Log.d("PremaCareApp", "Snapshot contains ${snapshot.documents.size} documents.")
+            snapshot.documents.forEachIndexed { index, doc ->
+                Log.d("PremaCareApp_DOC", "Doc $index ID: ${doc.id}, Data: ${doc.data}")
+            }
+            // *************************************************
+
+            val messageList = snapshot.toObjects(Message::class.java) // Fjernet ?: emptyList() for å se om toObjects kaster feil, men Firebase SDK returnerer vanligvis en tom liste.
             _messages.value = messageList
 
-            // Sjekk etter uleste meldinger
-            val hasUnread = messageList.any { !it.isRead && it.senderid == "Sykepleier" }
-            _hasUnreadMessages.value = hasUnread // <-- Den skal være her!
-            Log.d("PremaCareApp", "Calculated hasUnreadMessages: $hasUnread. Current _hasUnreadMessages.value: ${_hasUnreadMessages.value}")
+            Log.d("PremaCareApp", "Deserialized ${messageList.size} messages from snapshot.") // Ny logg for å bekrefte deserialisering
 
+            // Sjekk etter uleste meldinger
+            val hasUnread = messageList.any { msg ->
+                // ***** NY VIKTIG LOGG: Deserialisert Message-objekt *****
+
+                Log.d("PremaCareApp_DEBUG", "Deserialized Message: senderid=${msg.senderid}, isRead=${msg.isRead}, message='${msg.message}'")
+
+                val isUnreadFromNurse = !msg.isRead && msg.senderid == "Sykepleier"
+                Log.d("PremaCareApp", "  Message: '${msg.message}', isRead: ${msg.isRead}, senderid: '${msg.senderid}'. Is unread from nurse: $isUnreadFromNurse")
+                isUnreadFromNurse
+            }
+            _hasUnreadMessages.value = hasUnread
+            Log.d("PremaCareApp", "Calculated hasUnreadMessages: $hasUnread. Current _hasUnreadMessages.value: ${_hasUnreadMessages.value}")
         }
     }
 

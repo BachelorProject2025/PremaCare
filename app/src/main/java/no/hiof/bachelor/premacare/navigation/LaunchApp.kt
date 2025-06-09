@@ -95,7 +95,7 @@ fun LaunchApp(auth: FirebaseAuth) {
     val firebaseViewModel: FirebaseViewModel = viewModel()
     val unreadState = firebaseViewModel.hasUnreadMessages.value
 
-    // <--- LEGG TIL DENNE LINJEN ETTER `unreadState` DEFINERES
+
     Log.d("PremaCareApp", "LaunchApp recomposed. unreadState: $unreadState")
 
     LaunchedEffect(Unit) {
