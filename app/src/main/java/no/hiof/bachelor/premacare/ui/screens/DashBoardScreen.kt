@@ -165,9 +165,9 @@ fun DashBoardScreen(takeMeToEc: () -> Unit) {
 
         }
 
-      //  item {
-      //      EmergencyCheckButton(takeMeToEc)
-      //  }
+        //  item {
+        //      EmergencyCheckButton(takeMeToEc)
+        //  }
 
         item {
             SpaceEm(20.dp)
@@ -179,6 +179,7 @@ fun DashBoardScreen(takeMeToEc: () -> Unit) {
         item {
             Text(color = Color.Black, text = "Nyttige Lenker", fontSize = 22.sp)
         }
+
 
         item {
             SpaceEm(10.dp)

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
 import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
 
 @Composable
@@ -31,6 +32,17 @@ fun MessageScreen() {
         firebaseViewModel.fetchMessagesRealtime() // Hent meldinger ved oppstart
         firebaseViewModel.fetchParentName()
     }
+
+    LaunchedEffect(messages) {
+        if (messages.isNotEmpty()) {
+            firebaseViewModel.markMessagesAsRead()
+
+            // Sett eksplisitt false lokalt etter kort delay
+            //delay(500) // gir Firestore litt tid
+            //firebaseViewModel.setHasUnreadMessages(false)
+        }
+    }
+
 
 
 

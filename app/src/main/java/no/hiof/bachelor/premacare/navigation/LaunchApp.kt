@@ -4,6 +4,7 @@ package no.hiof.bachelor.premacare.navigation
 import CoParentScreen
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,8 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Dashboard
@@ -30,6 +33,7 @@ import androidx.compose.material.icons.outlined.Inventory
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Message
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Badge
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,9 +44,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -53,6 +60,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -70,6 +78,8 @@ import no.hiof.bachelor.premacare.ui.screens.NewEntry
 import no.hiof.bachelor.premacare.ui.screens.PasswordResetScreen
 import no.hiof.bachelor.premacare.ui.screens.RegisterScreen
 import no.hiof.bachelor.premacare.ui.screens.SettingsScreen
+import no.hiof.bachelor.premacare.viewModels.FirebaseViewModel
+import androidx.compose.runtime.livedata.observeAsState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +92,18 @@ fun LaunchApp(auth: FirebaseAuth) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val currentSelectedItem = remember { mutableStateOf(AppScreens.DashBoard) }
+    val firebaseViewModel: FirebaseViewModel = viewModel()
+    val unreadState = firebaseViewModel.hasUnreadMessages.value
+
+    // <--- LEGG TIL DENNE LINJEN ETTER `unreadState` DEFINERES
+    Log.d("PremaCareApp", "LaunchApp recomposed. unreadState: $unreadState")
+
+    LaunchedEffect(Unit) {
+        firebaseViewModel.fetchMessagesRealtime() //
+    }
+
+
+
 
     // Check authentication status
     val currentUser = auth.currentUser
@@ -170,8 +192,8 @@ fun LaunchApp(auth: FirebaseAuth) {
             }
         }
     }, bottomBar = {
+
         if (isBottomBarVisible.value) {
-            //ice blue Color(0xFFE6F7FF)
             BottomAppBar(containerColor = colorResource(R.color.top_and_navbar_blue)) {
                 Row(
                     modifier = Modifier
@@ -182,32 +204,51 @@ fun LaunchApp(auth: FirebaseAuth) {
                 ) {
                     for (item in items) {
                         val isSelected = item.screen == currentSelectedItem.value
+                        val isMessageItem = item.screen == AppScreens.Message
+
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .clickable {
-                                    navController.navigate(item.screen.name)
-                                    currentSelectedItem.value = item.screen
-                                }
+                            modifier = Modifier.clickable {
+                                navController.navigate(item.screen.name)
+                                currentSelectedItem.value = item.screen
+                            }
                         ) {
-                            Icon(
-                                imageVector = item.icon,
-                                contentDescription = item.label,
-                                modifier = Modifier.size(21.dp),
-                                tint = if (isSelected) Color(0xFF5A6C7B) else Color(0xFF0077B6)
+                            if (isMessageItem && unreadState) {
+                                BadgedBox(badge = {
+                                    Badge(containerColor = Color.Red, content = {
+                                        
+                                    })
+                                }) {
+                                    Icon(
+                                        imageVector = item.icon,
+                                        contentDescription = item.label,
+                                        modifier = Modifier.size(21.dp),
+                                        tint = if (isSelected) Color(0xFF5A6C7B) else Color(
+                                            0xFF0077B6
+                                        )
+                                    )
+                                }
+                            } else {
+                                Icon(
+                                    imageVector = item.icon,
+                                    contentDescription = item.label,
+                                    modifier = Modifier.size(21.dp),
+                                    tint = if (isSelected) Color(0xFF5A6C7B) else Color(0xFF0077B6)
+                                )
+                            }
 
-                            )
                             Text(
                                 text = item.label,
                                 color = if (isSelected) Color(0xFF5A6C7B) else Color(0xFF0077B6)
-                                )
-
+                            )
                         }
                     }
                 }
             }
         }
-    }, floatingActionButton = {
+
+
+}, floatingActionButton = {
         if (isFloatingActionButtonVisible.value){
             SearchFloatingAction(toEntry = {
                 navController.navigate(AppScreens.NewEntry.name)

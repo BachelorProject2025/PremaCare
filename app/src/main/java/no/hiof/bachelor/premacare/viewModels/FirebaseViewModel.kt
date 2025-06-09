@@ -1,5 +1,7 @@
 package no.hiof.bachelor.premacare.viewModels
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,10 @@ import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
 
 
 class FirebaseViewModel : ViewModel() {
@@ -509,52 +515,38 @@ class FirebaseViewModel : ViewModel() {
     //------------------ Message ----------------------
 
 
-    //fun fetchMessages() {
-    //    val userId = auth.currentUser?.uid ?: return
-    //    CoroutineScope(Dispatchers.IO).launch {
-    //        try {
-    //            val messageList = firestore.collection("users")
-    //                .document(userId)
-    //                .collection("messages")
-    //                .orderBy("timestamp")
-    //                .get()
-    //                .await()
-    //                .toObjects(Message::class.java)
-
-    //            withContext(Dispatchers.Main) {
-    //                _messages.value = messageList
-    //            }
-    //        } catch (e: Exception) {
-    //            println("Error fetching messages: ${e.message}")
-    //        }
-    //    }
-    //}
 
     private val _messages = MutableLiveData<List<Message>>()
     val messages: LiveData<List<Message>> get() = _messages
 
-    // Funksjon for å hente meldinger
-   //fun fetchMessages() {
-   //    val userId = auth.currentUser?.uid ?: return
-   //    CoroutineScope(Dispatchers.IO).launch {
-   //        try {
-   //            val messageList = firestore.collection("users")
-   //                .document(userId)
-   //                .collection("messages")
-   //                .orderBy("timestamp")
-   //                .get()
-   //                .await()
-   //                .toObjects(Message::class.java)
+    private val _hasUnreadMessages = mutableStateOf(false)
+    val hasUnreadMessages: State<Boolean> = _hasUnreadMessages
 
-   //            withContext(Dispatchers.Main) {
-   //                // Updating LiveData
-   //                _messages.value = messageList
-   //            }
-   //        } catch (e: Exception) {
-   //            println("Error fetching messages: ${e.message}")
-   //        }
-   //    }
-   //}
+
+
+    //fun fetchMessagesRealtime() {
+    //    val userId = auth.currentUser?.uid ?: return
+    //    val messagesRef = firestore.collection("users")
+    //        .document(userId)
+    //        .collection("messages")
+    //        .orderBy("timestamp")
+//
+    //    messagesRef.addSnapshotListener { snapshot, error ->
+    //        if (error != null) {
+    //            println("Error fetching messages: ${error.message}")
+    //            return@addSnapshotListener
+    //        }
+//
+    //        val messageList = snapshot?.toObjects(Message::class.java) ?: emptyList()
+    //        _messages.value = messageList
+//
+    //        // Sjekk etter uleste meldinger
+    //        val hasUnread = messageList.any { !it.isRead && it.senderid == "Sykepleier" }
+    //        _hasUnreadMessages.value = hasUnread
+    //    }
+    //}
+
+    // I FirebaseViewModel.kt
 
     fun fetchMessagesRealtime() {
         val userId = auth.currentUser?.uid ?: return
@@ -571,8 +563,18 @@ class FirebaseViewModel : ViewModel() {
 
             val messageList = snapshot?.toObjects(Message::class.java) ?: emptyList()
             _messages.value = messageList
+
+            // Sjekk etter uleste meldinger
+            val hasUnread = messageList.any { !it.isRead && it.senderid == "Sykepleier" }
+            _hasUnreadMessages.value = hasUnread // <-- Den skal være her!
+            Log.d("PremaCareApp", "Calculated hasUnreadMessages: $hasUnread. Current _hasUnreadMessages.value: ${_hasUnreadMessages.value}")
+
         }
     }
+
+            fun setHasUnreadMessages(value: Boolean) {
+            _hasUnreadMessages.value = value
+        }
 
     fun sendMessage(messageText: String) {
         val userId = auth.currentUser?.uid ?: return
@@ -593,6 +595,106 @@ class FirebaseViewModel : ViewModel() {
             }
         }
     }
+
+
+
+
+    fun markMessagesAsRead() {
+        val userId = auth.currentUser?.uid ?: return
+        // Filtrer kun sykepleier-meldinger som er ulest.
+        val unreadNurseMessages = _messages.value?.filter { !it.isRead && it.senderid == "Sykepleier" } ?: emptyList()
+
+        Log.d("PremaCareApp", "markMessagesAsRead() called. Found ${unreadNurseMessages.size} unread nurse messages to mark.")
+
+        if (unreadNurseMessages.isEmpty()) {
+            Log.d("PremaCareApp", "No unread nurse messages found to mark as read.")
+            // Hvis det ikke er noen uleste, sørg for at badgen er av.
+            // Dette kan trigge lytteren og sette _hasUnreadMessages til false.
+            _hasUnreadMessages.value = false // Sett til false med en gang hvis ingen å markere
+            return
+        }
+
+        // Bruk CoroutineScope for å håndtere asynkrone oppdateringer sekvensielt
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val batch = firestore.batch() // Bruk batch for å oppdatere flere dokumenter mer effektivt
+
+                for (msg in unreadNurseMessages) {
+                    // VIKTIG: Hent dokument-ID fra meldingen, ikke søk på timestamp hvis mulig.
+                    // Hvis du har en ID i Message-objektet ditt, bruk den!
+                    // For nå antar jeg du har en id i Message-objektet ditt, la oss sjekke:
+                    // Data class Message: val senderid: String = "", val message: String = "", val timestamp: Long = System.currentTimeMillis(), val isRead: Boolean = false
+                    // Din Message-data class mangler en ID. Dette er et problem for pålitelig oppdatering.
+                    // Det er mye bedre å oppdatere via document ID.
+                    // Hvis du får IDen fra Firestore når du deserialiserer til Message, må du lagre den i Message-objektet.
+
+                    // For nå, la oss fortsette med din 'whereEqualTo' tilnærming, men husk det er en svakhet.
+                    // Den tryggeste måten er å hente dokument-IDen når du fetcher meldinger,
+                    // og deretter bruke den til å oppdatere.
+                    // Example: firestore.collection(...).document(msg.id).update(...)
+
+                    // Siden du ikke har id i din Message data class:
+                    val querySnapshot = firestore.collection("users")
+                        .document(userId)
+                        .collection("messages")
+                        .whereEqualTo("timestamp", msg.timestamp)
+                        .whereEqualTo("senderid", msg.senderid)
+                        .limit(1) // Viktig for å unngå å markere flere om timestamp ikke er unik nok.
+                        .get()
+                        .await() // Vent på at spørringen fullføres
+
+                    for (doc in querySnapshot.documents) {
+                        batch.update(doc.reference, "isRead", true)
+                        Log.d("PremaCareApp", "  Added update to batch for message: ${doc.id}")
+                    }
+                }
+                batch.commit().await() // Utfør alle oppdateringene i en batch og vent på at de fullføres
+
+                Log.d("PremaCareApp", "All mark-as-read updates completed in Firestore via batch.")
+
+                // Etter at alle oppdateringer er committed og awaitet,
+                // må vi gi Firestore litt tid til å synkronisere *før* lytteren trigges med de nye dataene.
+                // Selv om await() er kraftig, er det fortsatt asynkrone nettverksoperasjoner.
+                // En liten delay kan hjelpe her.
+                // ENDA BEDRE: Firestore lytteren (addSnapshotListener) vil automatisk trigges
+                // når endringene er reflektert i databasen. Du trenger ikke å tvinge en sjekk her.
+                // Bare la den automatisk håndtere det.
+                // Nøkkelen er at oppdateringene MÅ være fullført FØR lytteren får den nye tilstanden.
+
+                // Den _hasUnreadMessages blir oppdatert av fetchMessagesRealtime() som har addSnapshotListener.
+                // Når batch.commit().await() er ferdig, vil Firestore trigge lytteren med de nye dataene,
+                // og da skal _hasUnreadMessages bli FALSE.
+                // Hvis det fremdeles er et problem, kan vi vurdere en liten forsinkelse her, men det er mindre ideelt.
+
+            } catch (e: Exception) {
+                Log.e("PremaCareApp", "Error marking messages as read: ${e.message}")
+            }
+        }
+    }
+    private fun checkForUnreadMessages(userId: String) {
+        firestore.collection("users")
+            .document(userId)
+            .collection("messages")
+            .whereEqualTo("isRead", false)
+            .whereEqualTo("senderid", "Sykepleier") // Kun sykepleier-meldinger
+            .get()
+            .addOnSuccessListener { docs ->
+                // Denne _hasUnreadMessages.value = !docs.isEmpty
+                // håndteres allerede av fetchMessagesRealtime() sin addSnapshotListener.
+                // Så du trenger ikke å oppdatere _hasUnreadMessages direkte her heller.
+                // Lytteren vil fange opp endringen når meldingene er lest.
+                // Men funksjonen kan beholdes om du vil trigge en spesifikk sjekk,
+                // men da må den oppdatere _hasUnreadMessages.value.
+                _hasUnreadMessages.value = !docs.isEmpty
+            }
+            .addOnFailureListener {
+                println("Failed to check for unread messages: ${it.message}")
+            }
+    }
+
+
+
+
 
     // legge til en medforelder
     fun registerCoParentWithRelogin(
@@ -642,33 +744,7 @@ class FirebaseViewModel : ViewModel() {
     }
 }
 
-// For å komme til ritkig profil som medforelder må vi bruke den andres uid
-//suspend fun getEffectiveUserIdSuspend(): String? {
-//    val auth = FirebaseAuth.getInstance()
-//    val db = FirebaseFirestore.getInstance()
-//    val currentUser = auth.currentUser
-//
-//    return if (currentUser != null) {
-//        try {
-//            val document = db.collection("users").document(currentUser.uid).get().await()
-//            if (document.exists()) {
-//                val coParentOf = document.getString("coParentOf")
-//                if (coParentOf != null) {
-//                    return coParentOf // Returnerer medforelderens UID
-//                } else {
-//                    return currentUser.uid // Returnerer Forelder 1
-//                }
-//            } else {
-//                null // Ingen brukerdata finnes
-//            }
-//        } catch (e: Exception) {
-//            Log.e("ERROR", "Feil ved henting av effektiv bruker-ID", e)
-//            return null
-//        }
-//    } else {
-//        null // Ingen bruker er logget inn
-//    }
-//}
+
 suspend fun getEffectiveUserIdSuspend(): String? {
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
