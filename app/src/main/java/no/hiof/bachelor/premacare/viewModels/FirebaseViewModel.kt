@@ -579,6 +579,7 @@ class FirebaseViewModel : ViewModel() {
             .collection("messages")
             .orderBy("timestamp")
 
+
         Log.d("PremaCareApp", "fetchMessagesRealtime called for userId: $userId") // Ny logg for å bekrefte kall
 
         messagesRef.addSnapshotListener { snapshot, error ->

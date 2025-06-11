@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -33,40 +35,84 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import no.hiof.bachelor.premacare.R
 
 
+//mposable
+// AboutUs() {
+// Column(horizontalAlignment = Alignment.CenterHorizontally,
+//     verticalArrangement = Arrangement.Top,
+//     modifier = Modifier
+//         .fillMaxSize()
+//         .background(Color(0xFFE5F3F6))
+//         .padding(16.dp)) {
+//     Text(
+//         fontSize = 18.sp,
+//         fontWeight = FontWeight.Bold,
+//         letterSpacing = 1.sp,
+//         text = "Alt om oss"
+//     )
+//     HorizontalLine()
+
+//     SpaceEm(15.dp)
+
+//     Text("PremaCare skal forenkle registreringen av slik\n" +
+//             "informasjon og bidra til en mer strukturert oversikt over barnets utvikling. Dette vil lette\n" +
+//             "hverdagen for foreldrene og gi helsepersonell\n" +
+//             "enklere tilgang til presise og oppdaterte data")
+
+
+//     SpaceEm(30.dp)
+
+//     ContactForm()
+
+
+// }
+
+//}
 
 @Composable
 fun AboutUs() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
+    LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFE5F3F6))
-            .padding(16.dp)) {
-        Text(
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 1.sp,
-            text = "Alt om oss"
-        )
-        HorizontalLine()
+            .padding(16.dp)
+    ) {
+        item {
+            Text(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+                text = "Alt om oss"
+            )
+        }
 
-        SpaceEm(15.dp)
+        item {
+            HorizontalLine()
+        }
 
-        Text("PremaCare skal forenkle registreringen av slik\n" +
-                "informasjon og bidra til en mer strukturert oversikt over barnets utvikling. Dette vil lette\n" +
-                "hverdagen for foreldrene og gi helsepersonell\n" +
-                "enklere tilgang til presise og oppdaterte data")
+        item {
+            SpaceEm(15.dp)
+        }
 
+        item {
+            Text("PremaCare skal forenkle registreringen av slik\n" +
+                    "informasjon og bidby til en mer strukturert oversikt over barnets utvikling. Dette vil lette\n" +
+                    "hverdagen for foreldrene og gi helsepersonell\n" +
+                    "enklere tilgang til presise og oppdaterte data")
+        }
 
-        SpaceEm(30.dp)
+        item {
+            SpaceEm(30.dp)
+        }
 
-        ContactForm()
-
-
+        item {
+            ContactForm()
+        }
     }
-
 }
 
 
@@ -155,8 +201,17 @@ private fun ContactForm() {
                     Toast.makeText(context, "Ingen e-postklient funnet.", Toast.LENGTH_SHORT).show()
                 }
 
-            },
-            modifier = Modifier.align(Alignment.End)
+            },colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(R.color.royal_blue),
+                contentColor = Color.White
+            ),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 6.dp,
+                pressedElevation = 2.dp
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
         ) {
             Text("Send")
         }

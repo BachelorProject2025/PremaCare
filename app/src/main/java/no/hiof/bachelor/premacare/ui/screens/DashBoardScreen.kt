@@ -617,7 +617,7 @@ fun DashboardCard(
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val isSmallScreen = screenHeight < 700.dp
+    val isSmallScreen = screenHeight < 800.dp
 
     val cardSize = if (isSmallScreen) 160.dp else 200.dp
 
@@ -698,7 +698,7 @@ fun WeightCard(
 ) {
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
-    val isSmallScreen = screenHeight < 700.dp
+    val isSmallScreen = screenHeight < 800.dp
 
     val cardSize = if (isSmallScreen) 160.dp else 200.dp
 
